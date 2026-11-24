@@ -1,0 +1,1578 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Matemática Computacional, Iscte Sintra: revisão de singularidades, séries de Laurent e resíduos, e aplicação ao cálculo de integrais impróprios. Slides interativos com exercícios aleatórios passo a passo.">
+<style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}[hidden]{display:none!important}</style>
+<title>Resíduos e integrais impróprios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Sora:wght@500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F3F5F8; --surface:#FFFFFF; --ink:#14233A; --muted:#4F5D73; --line:#D5DCE6; --soft:#E8EEF5; --grid:#E6EBF2;
+  --blue:#1F4E8C; --accent:#C8521F; --teal:#0B6F7E; --green:#1F7A4D; --red:#B3261E; --purple:#6B3FA0;
+  --shadow:0 1px 2px rgba(20,35,58,.05),0 10px 28px rgba(20,35,58,.07);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1420; --surface:#152032; --ink:#E7EDF5; --muted:#A7B4C6; --line:#2A3A52; --soft:#1B293E; --grid:#1D2A3D;
+    --blue:#8DB6F2; --accent:#F08A4B; --teal:#4CC6D3; --green:#5BC98E; --red:#F2867E; --purple:#B79AE6;
+    --shadow:none; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1420; --surface:#152032; --ink:#E7EDF5; --muted:#A7B4C6; --line:#2A3A52; --soft:#1B293E; --grid:#1D2A3D;
+  --blue:#8DB6F2; --accent:#F08A4B; --teal:#4CC6D3; --green:#5BC98E; --red:#F2867E; --purple:#B79AE6;
+  --shadow:none; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+button{font:inherit;color:inherit}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace}
+
+/* barras */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:6;background:var(--surface);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.tb-in{height:42px;display:flex;align-items:center;gap:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden}
+.brand{font-family:Sora,"IBM Plex Sans",system-ui,sans-serif;font-weight:600;color:var(--ink)}
+.brand i{font-style:normal;color:var(--accent)}
+.sec{text-transform:uppercase;letter-spacing:.09em;font-size:11px;color:var(--teal);font-weight:600}
+.ttl{margin-left:auto;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.prog{position:absolute;left:0;right:0;bottom:-1px;height:3px}
+.prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .35s ease}
+.stage{position:fixed;left:0;right:0;top:calc(43px + env(safe-area-inset-top,0px));bottom:calc(54px + env(safe-area-inset-bottom,0px));overflow:hidden}
+.bottombar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.bb-in{height:54px;display:flex;align-items:center;gap:6px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:13.5px}
+.nbtn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--ink);white-space:nowrap}
+.nbtn:hover{background:var(--soft)}
+.nbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.nbtn.round{width:40px;padding:0;justify-content:center}
+.nbtn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.counter{min-width:64px;text-align:center;font-variant-numeric:tabular-nums;color:var(--muted)}
+.bb-in .sp{flex:1}
+@media (max-width:620px){.keys{display:none}.nbtn .lb{display:none}.nbtn:not(.round){padding:0 10px}.brand{display:none}.ttl{margin-left:0}}
+
+/* diapositivos */
+.slide{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-block:1.1em 1.6em;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  font-size:clamp(15px,min(1.4vw,2.5vh),30px);line-height:1.45;
+  visibility:hidden;opacity:0;transform:translateX(22px);transition:opacity .35s ease,transform .35s ease,visibility 0s linear .35s}
+.slide.past{transform:translateX(-22px)}
+.slide.active{visibility:visible;opacity:1;transform:none;transition:opacity .35s ease,transform .35s ease,visibility 0s}
+.wrap{max-width:62em;margin:0 auto;min-height:100%;display:flex;flex-direction:column;justify-content:center}
+.slide h1{font-family:Sora,"IBM Plex Sans",system-ui,sans-serif;font-weight:700;font-size:2.55em;line-height:1.06;margin:.15em 0 .35em;text-wrap:balance;letter-spacing:-.015em}
+.slide h2{font-family:Sora,"IBM Plex Sans",system-ui,sans-serif;font-weight:600;font-size:1.55em;line-height:1.15;margin:0 0 .5em;text-wrap:balance;letter-spacing:-.005em}
+.slide h3{font-family:Sora,"IBM Plex Sans",system-ui,sans-serif;font-weight:600;font-size:1em;line-height:1.25;margin:0 0 .4em;text-wrap:balance}
+.slide p{margin:.4em 0}
+.slide ul,.slide ol{margin:.3em 0;padding-left:1.25em}
+.slide li{margin:.18em 0}
+.box li{margin:.4em 0}
+.lead{font-size:1.08em;color:var(--muted);max-width:44em}
+.muted{color:var(--muted)}
+.small{font-size:.86em}
+.tiny{font-size:.76em}
+.kicker{font-size:.8em;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);font-weight:600;margin:0}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1.5em;align-items:start}
+.cols.c64{grid-template-columns:minmax(0,1.22fr) minmax(0,1fr)}
+.cols.c46{grid-template-columns:minmax(0,1fr) minmax(0,1.22fr)}
+.cols.mid{align-items:center}
+.cols3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1em}
+.cols3>*,.cols>*{min-width:0}
+@media (max-width:880px){.cols,.cols.c64,.cols.c46,.cols3{grid-template-columns:minmax(0,1fr)}}
+
+/* caixas */
+.box{--c:var(--blue);border-left:4px solid var(--c);background:color-mix(in srgb,var(--c) 7%,var(--surface));padding:.55em .9em .6em;border-radius:0 12px 12px 0;margin:.55em 0}
+.box>.k{display:block;font-family:Sora,"IBM Plex Sans",system-ui,sans-serif;font-weight:600;color:var(--c);font-size:.72em;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.15em}
+.def,.teo,.prop{--c:var(--blue)}
+.ex{--c:var(--green)}
+.nota{--c:var(--muted)}
+.erro{--c:var(--accent)}
+.ideia{--c:var(--purple)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:.8em .95em;box-shadow:var(--shadow);margin:.4em 0}
+.good{color:var(--green);font-weight:600}
+.bad{color:var(--red);font-weight:600}
+kbd{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8em;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:.05em .4em;background:var(--surface);color:var(--ink)}
+
+/* passos */
+.step{opacity:0;transform:translateY(8px);transition:opacity .4s ease,transform .4s ease;pointer-events:none}
+.step.on,body.study .step{opacity:1;transform:none;pointer-events:auto}
+
+/* controlos */
+.seg{display:flex;flex-wrap:wrap;gap:.35em;margin:.35em 0 .5em}
+.seg button,.btn{font-size:.82em;padding:.32em .85em;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;line-height:1.3}
+.seg button:hover,.btn:hover{background:var(--soft)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:var(--surface);font-weight:600}
+.btn.primary:hover{filter:brightness(1.08);background:var(--teal)}
+.btn:disabled{opacity:.45;cursor:default}
+.ctrl{display:flex;flex-wrap:wrap;align-items:center;gap:.5em .7em;margin:.45em 0}
+.ctrl label{display:inline-flex;align-items:center;gap:.5em;font-size:.85em;color:var(--muted)}
+input[type=range]{accent-color:var(--teal);width:min(260px,52vw)}
+.stack{display:grid;grid-template-columns:minmax(0,1fr)}
+.stack>*{min-width:0;grid-area:1/1;visibility:hidden;opacity:0;transition:opacity .3s ease}
+.stack>.on{visibility:visible;opacity:1}
+.reg{opacity:0;transition:opacity .4s ease}
+.reg.on{opacity:1}
+
+/* matemática */
+mjx-container[display="true"]{margin:.45em 0!important;max-width:100%;overflow-x:auto;overflow-y:hidden;padding:.1em 0}
+mjx-container{color:inherit}
+mjx-container.wide{display:block!important;overflow-x:auto;overflow-y:hidden;max-width:100%;margin:.2em 0;padding:.1em 0}
+.pp,.pp *{fill:var(--accent);stroke:var(--accent)}
+.tl,.tl *{fill:var(--teal);stroke:var(--teal)}
+.gr,.gr *{fill:var(--green);stroke:var(--green)}
+.bl,.bl *{fill:var(--blue);stroke:var(--blue)}
+
+/* SVG */
+svg.fig{width:100%;height:auto;display:block;max-height:52vh}
+.fig text{font-family:"IBM Plex Sans",system-ui,sans-serif;fill:var(--ink);font-size:14px}
+.fig text.m{font-style:italic;font-family:"STIX Two Text","Times New Roman",serif;font-size:16px}
+.fig text.lbl{fill:var(--muted);font-size:12.5px}
+.ax{stroke:var(--muted);stroke-width:1.2;fill:none}
+.gl{stroke:var(--grid);stroke-width:1;fill:none}
+.cur{stroke:var(--teal);stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.cur2{stroke:var(--accent);stroke-width:2.4;fill:none;stroke-linecap:round}
+.curb{stroke:var(--blue);stroke-width:2.4;fill:none;stroke-linecap:round}
+.dash{stroke-dasharray:5 5}
+.ah{fill:var(--teal)}
+.pole{fill:var(--accent)}
+.pole.out{fill:var(--muted);opacity:.55}
+.dot{fill:var(--teal)}
+.hole{fill:var(--surface);stroke:var(--accent);stroke-width:2}
+.area{fill:color-mix(in srgb,var(--teal) 16%,transparent)}
+.areaA{fill:color-mix(in srgb,var(--accent) 10%,transparent)}
+.areaG{fill:color-mix(in srgb,var(--green) 10%,transparent)}
+.draw{stroke-dasharray:1;stroke-dashoffset:1}
+.draw.run{animation:draw 2.4s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.pulse{animation:pulse 2.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
+
+/* capa */
+.cover{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:2em;align-items:center}
+@media (max-width:880px){.cover{grid-template-columns:minmax(0,1fr)}}
+.cover .date{font-family:Sora,"IBM Plex Sans",system-ui,sans-serif;font-weight:500;color:var(--ink);margin-top:1em}
+.keys{font-size:.78em;color:var(--muted);margin-top:1.6em!important;line-height:2}
+.keys kbd{margin-right:.25em}
+.keys span{margin-right:1em;white-space:nowrap}
+figure{margin:0}
+figcaption{font-size:.9em;color:var(--muted);text-align:center;margin-top:.3em}
+
+/* plano */
+.plan{list-style:none;padding:0!important;margin:0;counter-reset:p}
+.plan li{counter-increment:p;display:grid;grid-template-columns:2.2em minmax(0,1fr);gap:.2em .6em;align-items:baseline;padding:.5em .6em;border-radius:12px;cursor:pointer;margin:.1em 0}
+.plan li:hover{background:var(--soft)}
+.plan li::before{content:counter(p,decimal-leading-zero);font-family:"IBM Plex Mono",monospace;color:var(--accent);font-weight:500}
+.plan li b{display:block;font-family:Sora,"IBM Plex Sans",system-ui,sans-serif;font-weight:600}
+.plan li .tag{font-size:.7em;text-transform:uppercase;letter-spacing:.08em;color:var(--teal);font-weight:600;margin-left:.4em}
+.chain{display:flex;flex-wrap:wrap;gap:.3em;align-items:center;font-size:.8em;margin-top:.6em}
+.chain span{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:.2em .7em}
+.chain i{font-style:normal;color:var(--muted)}
+
+/* cartões */
+.card{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--c,var(--blue));border-radius:12px;padding:.7em .9em;box-shadow:var(--shadow)}
+.card h3{color:var(--c,var(--blue))}
+.card .feel{font-size:.86em;color:var(--muted);border-top:1px dashed var(--line);margin-top:.5em;padding-top:.45em}
+.linkcard{cursor:pointer}
+.linkcard:hover{border-color:var(--c,var(--blue))}
+
+/* quiz */
+.qf{font-size:1.15em;min-height:3.2em;display:flex;align-items:center;justify-content:center}
+.opts{display:flex;flex-wrap:wrap;gap:.4em;justify-content:center;margin:.5em 0}
+.opts button{font-size:.86em;padding:.45em .9em;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer}
+.opts button:hover:not(:disabled){background:var(--soft)}
+.opts button.right{background:color-mix(in srgb,var(--green) 18%,var(--surface));border-color:var(--green);color:var(--ink);font-weight:600}
+.opts button.wrong{background:color-mix(in srgb,var(--red) 14%,var(--surface));border-color:var(--red)}
+.opts button:disabled{cursor:default}
+.fb{min-height:4.5em;font-size:.92em}
+
+/* passos dos exercícios */
+.xsteps{position:relative}
+.xstep{border-left:3px solid var(--line);padding:.15em 0 .3em .85em;margin:.35em 0}
+.xsteps .xstep:not(.on){position:absolute;left:0;right:0;top:0;visibility:hidden;pointer-events:none}
+.xsteps .xstep.on{animation:fadeUp .4s ease both}
+.xstep.last{border-left-color:var(--teal)}
+.xs-k{display:block;font-family:Sora,"IBM Plex Sans",system-ui,sans-serif;font-size:.7em;text-transform:uppercase;letter-spacing:.08em;color:var(--teal);font-weight:600}
+.xstep.fin{background:color-mix(in srgb,var(--green) 8%,var(--surface));border-left-color:var(--green);border-radius:0 10px 10px 0;padding-right:.6em}
+.xstep.fin .xs-k{color:var(--green)}
+.check{font-size:.8em;color:var(--muted);font-family:"IBM Plex Mono",monospace}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.enun{font-size:1.02em}
+.hint{font-size:.8em;color:var(--muted)}
+
+/* tabela */
+table.vals{border-collapse:collapse;width:100%;font-size:.88em}
+table.vals td,table.vals th{padding:.28em .45em;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+table.vals th{font-weight:600;color:var(--muted);font-size:.85em}
+table.vals td.num{font-family:"IBM Plex Mono",monospace;text-align:right;white-space:nowrap}
+table.vals tr.hl td{background:color-mix(in srgb,var(--teal) 9%,transparent)}
+.warn{color:var(--accent);font-size:.85em;min-height:1.3em}
+.tbl-wrap{overflow-x:auto}
+
+/* domain coloring */
+.dcw{position:relative;max-width:min(100%,58vh);margin:0 auto}
+.dcw canvas{width:100%;aspect-ratio:1/1;display:block;border-radius:10px;border:1px solid var(--line);background:var(--soft)}
+.dcw .axl{position:absolute;font-size:.7em;color:#fff;text-shadow:0 0 3px #000;font-family:"IBM Plex Mono",monospace}
+.vseg{display:flex;flex-direction:column;align-items:stretch;gap:.35em}
+.vseg button{text-align:left;font-size:.9em;padding:.4em .8em;border-radius:10px}
+
+/* índice */
+.idx{position:fixed;inset:0;z-index:20;background:color-mix(in srgb,var(--bg) 70%,transparent);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:calc(56px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(70px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));overflow:auto}
+.idx-in{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:1em 1.2em;width:min(720px,100%)}
+.idx-in h3{font-family:Sora,"IBM Plex Sans",system-ui,sans-serif;margin:.2em 0 .5em;font-size:1.1em}
+.idx-in h4{margin:.8em 0 .2em;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--teal)}
+.idx-in ol{list-style:none;margin:0;padding:0;columns:2 260px;column-gap:1.2em}
+.idx-in li{break-inside:avoid}
+.idx-in li button{display:flex;gap:.6em;width:100%;text-align:left;background:none;border:0;padding:.3em .4em;border-radius:8px;cursor:pointer;font-size:14px}
+.idx-in li button:hover{background:var(--soft)}
+.idx-in li button span{font-family:"IBM Plex Mono",monospace;color:var(--muted);min-width:1.6em}
+.idx-in li.cur button{background:var(--soft);font-weight:600}
+.toast{position:fixed;left:50%;bottom:calc(70px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:.5em 1em;border-radius:999px;font-size:13px;z-index:30;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.on{opacity:1}
+.loading{position:fixed;inset:0;z-index:40;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--muted);font-size:14px;transition:opacity .4s}
+.loading.off{opacity:0;pointer-events:none}
+.loading .sp{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--accent);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){
+  .slide,.step,.stack>*,.reg{transition:none!important}
+  .draw.run{animation:none;stroke-dashoffset:0}
+  .pulse,.xsteps .xstep.on{animation:none}
+}
+</style>
+<script>
+window.MathJax={
+  tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']],packages:{'[+]':['html']},
+    macros:{Res:'\\operatorname{Res}',Ind:'\\operatorname{Ind}',sen:'\\operatorname{sen}',C:'\\mathbb{C}',R:'\\mathbb{R}',N:'\\mathbb{N}',Z:'\\mathbb{Z}',Re:'\\operatorname{Re}',Im:'\\operatorname{Im}'}},
+  svg:{fontCache:'global'},
+  options:{enableMenu:false},
+  startup:{typeset:true,pageReady:function(){return MathJax.startup.defaultPageReady().then(function(){document.documentElement.classList.add('mj-ok');var l=document.getElementById('loading');if(l)l.classList.add('off');});}}
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg-full.js"></script>
+
+</head>
+<body>
+<div class="loading" id="loading"><div class="sp"></div>A preparar as fórmulas…</div>
+
+<header class="topbar">
+  <div class="tb-in"><span class="brand">Matemática Computacional <i>·</i> 2026/2027</span><span class="sec" id="secLbl"></span><span class="ttl" id="ttlLbl"></span></div>
+  <div class="prog"><i id="progBar"></i></div>
+</header>
+
+<main class="stage" id="stage">
+
+<!-- 1 · CAPA -->
+<section class="slide" data-id="capa" data-title="Capa" data-sec="">
+<div class="wrap">
+  <div class="cover">
+    <div>
+      <p class="kicker">Matemática Computacional · Licenciatura em MATD</p>
+      <h1>Resíduos e integrais impróprios</h1>
+      <p class="lead">Revisão de singularidades, séries de Laurent, classificação e teorema dos resíduos. Depois, a aplicação ao cálculo de integrais impróprios e outras aplicações.</p>
+      <p class="date">24 de novembro de 2026</p>
+      <p class="keys"><span><kbd>→</kbd> avançar</span><span><kbd>←</kbd> recuar</span><span><kbd>I</kbd> índice</span><span><kbd>E</kbd> modo estudo</span><span><kbd>F</kbd> ecrã inteiro</span></p>
+    </div>
+    <figure>
+      <svg class="fig" viewBox="0 0 440 300" aria-label="Semicircunferência no semiplano superior a envolver os polos i e 2i">
+        <line class="gl" x1="20" y1="190" x2="420" y2="190"/><line class="gl" x1="20" y1="140" x2="420" y2="140"/><line class="gl" x1="20" y1="90" x2="420" y2="90"/><line class="gl" x1="20" y1="290" x2="420" y2="290"/>
+        <line class="ax" x1="14" y1="240" x2="426" y2="240"/><line class="ax" x1="220" y1="298" x2="220" y2="14"/>
+        <path id="cvPath" class="cur draw" pathLength="1" d="M60 240 L380 240 A160 160 0 0 0 60 240"/>
+        <circle class="pole pulse" cx="220" cy="190" r="6"/><circle class="pole pulse" cx="220" cy="140" r="6" style="animation-delay:.6s"/>
+        <circle class="pole out" cx="220" cy="290" r="5"/>
+        <text class="m" x="230" y="186">i</text><text class="m" x="230" y="136">2i</text><text class="m" x="230" y="286" style="opacity:.6">−i</text>
+        <text class="m" x="52" y="260">−R</text><text class="m" x="372" y="260">R</text><text class="m" x="352" y="112" style="fill:var(--teal)">C<tspan dy="4" font-size="11">R</tspan></text>
+        <circle r="6.5" class="dot"><animateMotion dur="5s" repeatCount="indefinite" begin="1s" rotate="auto"><mpath href="#cvPath"/></animateMotion></circle>
+      </svg>
+      <figcaption>\(\displaystyle\int_{-R}^{R} f(x)\,dx+\int_{C_R} f(z)\,dz=2\pi i\sum_{\Im a\gt 0}\Res(f,a)\)</figcaption>
+    </figure>
+  </div>
+</div>
+</section>
+
+<!-- 2 · PLANO -->
+<section class="slide" data-id="plano" data-title="Plano da aula" data-sec="Plano">
+<div class="wrap">
+  <h2>Plano da aula</h2>
+  <div class="cols c64">
+    <div>
+      <ol class="plan">
+        <li data-go="singularidades"><span><b>Singularidades isoladas e séries de Laurent <span class="tag">revisão</span></b><span class="small muted">Potências negativas de \(z-a\); a série depende do anel.</span></span></li>
+        <li data-go="classificacao"><span><b>Classificação das singularidades <span class="tag">revisão</span></b><span class="small muted">Removível, polo de ordem \(m\), essencial; critério dos limites.</span></span></li>
+        <li data-go="residuo"><span><b>Resíduos e teorema dos resíduos <span class="tag">revisão</span></b><span class="small muted">\(\Res(f,a)=c_{-1}\) e \(\int_\gamma f=2\pi i\sum\Res(f,a_k)\Ind_\gamma(a_k)\).</span></span></li>
+        <li data-go="problema"><span><b>Integrais impróprios <span class="tag" style="color:var(--accent)">hoje</span></b><span class="small muted">\(\int_{-\infty}^{+\infty}\frac{P(x)}{Q(x)}\,dx\) com uma semicircunferência (tipo Projeto 1).</span></span></li>
+        <li data-go="aplicacoes"><span><b>Outras aplicações <span class="tag" style="color:var(--accent)">hoje</span></b><span class="small muted">Integrais trigonométricos, integrais com \(\cos x\) e \(\sen x\), ponte para as EDO.</span></span></li>
+      </ol>
+    </div>
+    <div>
+      <div class="box ideia step"><span class="k">Objetivo final</span>Calcular integrais <b>reais</b> como
+        \[\int_{-\infty}^{+\infty}\frac{x+1}{(x^2+1)(x^2+4)}\,dx\]\[\int_0^{+\infty}\frac{dx}{(x^2+1)^2}\]
+        sem primitivas, saindo para o plano complexo.</div>
+      <div class="chain step"><span>singularidade isolada</span><i>→</i><span>série de Laurent</span><i>→</i><span>classificação</span><i>→</i><span>resíduo \(=c_{-1}\)</span><i>→</i><span>teorema dos resíduos</span><i>→</i><span>integrais impróprios</span></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 3 · SINGULARIDADES ISOLADAS -->
+<section class="slide" data-id="singularidades" data-title="Singularidades isoladas" data-sec="Revisão" data-w="acum">
+<div class="wrap">
+  <h2>Singularidades isoladas</h2>
+  <div class="cols">
+    <div>
+      <div class="box def"><span class="k">Definição (Def. 4.24)</span>Se \(f\) é holomorfa em \(B_r(a)\setminus\{a\}\) para algum \(r\gt0\), mas não é holomorfa em \(B_r(a)\), dizemos que \(a\) é uma <b>singularidade isolada</b> de \(f\).</div>
+      <div class="box ex step"><span class="k">Exemplos</span>
+        <ul>
+          <li>\(\dfrac1z\) e \(\dfrac{\sen z}{z}\) têm uma singularidade isolada em \(0\).</li>
+          <li>\(\dfrac{z^2e^z}{(z-2i)^3(z+4)^2}\) tem singularidades isoladas em \(2i\) e em \(-4\).</li>
+        </ul>
+      </div>
+      <div class="box nota step"><span class="k">Na prática</span>Nos exercícios, as singularidades são quase sempre os <b>zeros do denominador</b>. Primeiro passo: resolver “denominador \(=0\)”.</div>
+    </div>
+    <div class="step">
+      <div class="panel nosw">
+        <h3>Contraexemplo: \(\dfrac{1}{\sen(1/z)}\) em \(0\)</h3>
+        <p class="small muted">Não está definida em \(0\) nem nos pontos \(z_k=\frac{1}{k\pi}\), \(k\in\Z\setminus\{0\}\). Faça zoom em torno de \(0\):</p>
+        <svg class="fig acum" viewBox="0 0 600 120" aria-label="Pontos 1/(kπ) a acumularem-se em 0"></svg>
+        <div class="ctrl"><button class="btn primary" data-act="play">▶ Zoom</button><input type="range" min="0" max="1000" value="0" aria-label="Zoom"><span class="mono small" data-out="w"></span></div>
+        <p class="small" data-out="txt"></p>
+      </div>
+      <p class="small">Como \(z_k\to0\), há singularidades tão perto de \(0\) quanto quisermos: \(0\) <b>não</b> é uma singularidade isolada.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 4 · LAURENT -->
+<section class="slide" data-id="laurent" data-title="Séries de Laurent" data-sec="Revisão">
+<div class="wrap">
+  <h2>Séries de Laurent</h2>
+  <div class="cols c64">
+    <div>
+      <p class="muted small" style="margin-top:0">Perto de uma singularidade não há série de Taylor. A solução é permitir <b>potências negativas</b> de \(z-a\).</p>
+      <div class="box teo"><span class="k">Teorema (Teo. 4.29)</span>Se \(f\) é holomorfa no anel \(A=\{z\in\C:\ r\lt|z-a|\lt R\}\), com \(0\le r\lt R\le+\infty\), então existem constantes <b>únicas</b> \(c_n\in\C\), \(n\in\Z\), tais que, para \(z\in A\),
+        \[\begin{aligned}f(z)&=\sum_{n\in\Z}c_n(z-a)^n\\&=\underbrace{\cdots+\frac{c_{-2}}{(z-a)^2}+\frac{c_{-1}}{z-a}}_{\text{parte principal}}+\underbrace{c_0+c_1(z-a)+\cdots}_{\text{parte regular}}\end{aligned}\]</div>
+      <div class="box nota step"><span class="k">Nota</span>Pela unicidade, a série pode ser obtida <b>por qualquer método</b>: usamos séries conhecidas (\(e^z\), \(\sen z\), \(\cos z\), geométrica). A série <b>depende do anel</b>.</div>
+    </div>
+    <div>
+      <figure class="panel">
+        <svg class="fig" style="max-height:25vh" viewBox="0 0 320 250" aria-label="Anel r menor que |z−a| menor que R">
+          <defs><marker id="mkA" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="ah"/></marker></defs>
+          <path class="area" fill-rule="evenodd" d="M160 20a105 105 0 1 0 0.01 0zM160 87a38 38 0 1 0 0.01 0z"/>
+          <circle cx="160" cy="125" r="105" class="ax dash"/><circle cx="160" cy="125" r="38" class="ax dash"/>
+          <g><circle cx="160" cy="125" r="70" class="cur" style="stroke-width:2"/>
+            <g><animateTransform attributeName="transform" type="rotate" from="0 160 125" to="-360 160 125" dur="7s" repeatCount="indefinite"/><path d="M230 125 l-6 9 l12 0 z" class="ah"/></g></g>
+          <line x1="160" y1="125" x2="234" y2="51" class="ax"/><line x1="160" y1="125" x2="127" y2="144" class="ax"/>
+          <circle cx="160" cy="125" r="5" class="pole"/>
+          <text class="m" x="150" y="118">a</text><text class="m" x="200" y="80">R</text><text class="m" x="128" y="160">r</text><text class="m" x="258" y="200" style="fill:var(--teal)">A</text><text class="m" x="222" y="170" style="fill:var(--teal)">γ</text>
+        </svg>
+        <figcaption>Os coeficientes são \(c_n=\frac{1}{2\pi i}\int_\gamma\frac{f(w)}{(w-a)^{n+1}}dw\), mas nunca os calculamos assim.</figcaption>
+      </figure>
+      <div class="box ex step"><span class="k">Exemplos em \(|z|\gt0\)</span>
+        \[\begin{aligned}\frac{\sen z}{z^3}&=\frac{1}{z^3}\Big(z-\frac{z^3}{3!}+\frac{z^5}{5!}-\cdots\Big)\\&=\frac{1}{z^2}-\frac16+\frac{z^2}{120}-\cdots\end{aligned}\]
+        \[e^{1/z}=\sum_{n\ge0}\frac{1}{n!\,z^n}=1+\frac1z+\frac{1}{2z^2}+\frac{1}{6z^3}+\cdots\]</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 5 · ANÉIS -->
+<section class="slide" data-id="aneis" data-title="A mesma função, anéis diferentes" data-sec="Revisão">
+<div class="wrap">
+  <h2>A mesma função, anéis diferentes</h2>
+  <p>\(f(z)=\dfrac{1}{z(z-1)}\) é holomorfa em \(\C\setminus\{0,1\}\). Usamos a série geométrica \(\dfrac{1}{1-w}=\displaystyle\sum_{n\ge0}w^n\), \(|w|\lt1\).</p>
+  <div class="cols c46 mid">
+    <div class="panel">
+      <div class="seg" data-stack="ring" role="group" aria-label="Escolher o anel">
+        <button>\(0\lt|z|\lt1\)</button><button>\(|z|\gt1\)</button><button>\(0\lt|z-1|\lt1\)</button>
+      </div>
+      <svg class="fig" viewBox="0 0 360 260" aria-label="Plano complexo com o anel escolhido">
+        <g data-stackof="ring">
+          <path class="reg area" fill-rule="evenodd" d="M130 30a100 100 0 1 0 0.01 0z"/>
+          <path class="reg area" fill-rule="evenodd" d="M0 0H360V260H0Z M130 30a100 100 0 1 0 0.01 0z"/>
+          <path class="reg area" fill-rule="evenodd" d="M230 30a100 100 0 1 0 0.01 0z"/>
+        </g>
+        <line class="ax" x1="0" y1="130" x2="360" y2="130"/><line class="ax" x1="130" y1="0" x2="130" y2="260"/>
+        <circle cx="130" cy="130" r="100" class="ax dash"/><circle cx="230" cy="130" r="100" class="ax dash" style="opacity:.5"/>
+        <circle cx="130" cy="130" r="6" class="hole"/><circle cx="230" cy="130" r="6" class="hole"/>
+        <text class="m" x="114" y="150">0</text><text class="m" x="236" y="150">1</text>
+      </svg>
+    </div>
+    <div class="stack" data-stackof="ring">
+      <div>
+        <h3>Em \(0\lt|z|\lt1\)</h3>
+        \[f(z)=-\frac1z\cdot\frac{1}{1-z}=-\frac1z\sum_{n\ge0}z^n=\class{pp}{-\frac1z}-1-z-z^2-\cdots\]
+        <p>Parte principal: \(-\frac1z\). Logo \(0\) é um <b>polo simples</b> e \(c_{-1}=-1\).</p>
+      </div>
+      <div>
+        <h3>Em \(|z|\gt1\)</h3>
+        \[f(z)=\frac{1}{z^2}\cdot\frac{1}{1-\frac1z}=\frac{1}{z^2}\sum_{n\ge0}\frac{1}{z^n}=\frac1{z^2}+\frac1{z^3}+\frac1{z^4}+\cdots\]
+        <p>Há infinitas potências negativas, mas isto <b>não</b> classifica a singularidade \(0\): o anel \(|z|\gt1\) não é da forma \(0\lt|z|\lt r\).</p>
+      </div>
+      <div>
+        <h3>Em \(0\lt|z-1|\lt1\)</h3>
+        \[f(z)=\frac{1}{z-1}\cdot\frac{1}{1+(z-1)}=\frac{1}{z-1}\sum_{n\ge0}(-1)^n(z-1)^n=\class{pp}{\frac{1}{z-1}}-1+(z-1)-\cdots\]
+        <p>Logo \(1\) é um <b>polo simples</b> e \(c_{-1}=1\).</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 6 · CLASSIFICAÇÃO -->
+<section class="slide" data-id="classificacao" data-title="Classificação das singularidades" data-sec="Revisão">
+<div class="wrap">
+  <h2>Classificação das singularidades isoladas</h2>
+  <p class="small muted" style="margin-top:0">Seja \(\sum_{n\in\Z}c_n(z-a)^n\) a série de Laurent de \(f\) em \(0\lt|z-a|\lt r\) (Def. 4.31).</p>
+  <div class="cols3">
+    <div class="card step" style="--c:var(--green)">
+      <h3>Singularidade removível</h3>
+      <p>\(c_n=0\) para todo o \(n\lt0\): <b>não há parte principal</b>.</p>
+      \[\frac{\sen z}{z}=1-\frac{z^2}{6}+\frac{z^4}{120}-\cdots\]
+      <p class="feel">\(f\) é limitada perto de \(a\): basta “tapar o buraco” (aqui, com o valor \(1\)).</p>
+    </div>
+    <div class="card step" style="--c:var(--accent)">
+      <h3>Polo de ordem \(m\)</h3>
+      <p>\(c_{-m}\neq0\) e \(c_n=0\) para \(n\lt-m\): parte principal <b>finita</b>. Ordem \(1\): polo simples.</p>
+      \[\frac{\sen z}{z^3}=\class{pp}{\frac{1}{z^2}}-\frac16+\frac{z^2}{120}-\cdots\]
+      <p class="feel">\(|f(z)|\to+\infty\) quando \(z\to a\). Aqui é um polo de ordem \(2\) (e <b>não</b> \(3\)).</p>
+    </div>
+    <div class="card step" style="--c:var(--purple)">
+      <h3>Singularidade essencial</h3>
+      <p>\(c_n\neq0\) para <b>infinitos</b> valores negativos de \(n\).</p>
+      \[e^{1/z}=1+\frac1z+\frac{1}{2z^2}+\frac{1}{6z^3}+\cdots\]
+      <p class="feel">Nenhuma das anteriores: \(e^{1/x}\to+\infty\) se \(x\to0^+\), mas \(e^{1/x}\to0\) se \(x\to0^-\).</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 7 · CORES -->
+<section class="slide" data-id="cores" data-title="Ver as singularidades" data-sec="Revisão" data-w="dc">
+<div class="wrap">
+  <h2>Ver as singularidades</h2>
+  <div class="cols c46 mid">
+    <div class="nosw">
+      <div class="dcw"><canvas width="420" height="420" aria-label="Coloração do domínio da função escolhida"></canvas></div>
+      <div class="ctrl" style="justify-content:center"><label>zoom <input type="range" min="0" max="1000" value="500" aria-label="Zoom"></label><span class="mono tiny" data-out="win"></span></div>
+    </div>
+    <div>
+      <div class="seg vseg" data-stack="dc" role="group" aria-label="Escolher a função">
+        <button>\(\dfrac{\sen z}{z}\) · removível em \(0\)</button>
+        <button>\(\dfrac{1}{z^2}\) · polo de ordem \(2\)</button>
+        <button>\(\dfrac{\sen z}{z^3}\) · polo de ordem \(2\)</button>
+        <button>\(\dfrac{1}{z(z-1)}\) · dois polos simples</button>
+        <button>\(e^{1/z}\) · essencial em \(0\)</button>
+      </div>
+      <div class="stack small" data-stackof="dc">
+        <p>Nada de especial em \(0\): a função prolonga-se com o valor \(1\). As “rodas” de cores em \(\pm\pi\) são zeros de \(\sen z\).</p>
+        <p>À volta de \(0\) as cores dão <b>duas voltas</b> (no sentido contrário ao de um zero) e os anéis acumulam-se: \(|f|\to+\infty\).</p>
+        <p>O mesmo desenho que \(\frac{1}{z^2}\) perto de \(0\): duas voltas de cores. O \(\sen z\) “come” uma potência de \(z\).</p>
+        <p>Uma volta de cores à volta de cada polo simples, em \(0\) e em \(1\).</p>
+        <p>Perto de \(0\) aparecem <b>todas as cores infinitas vezes</b>: nem limitada, nem \(|f|\to+\infty\). Faça zoom!</p>
+      </div>
+      <p class="tiny muted">Cada ponto \(z\) é pintado com a cor do argumento de \(f(z)\): vermelho para \(\arg f(z)=0\), depois amarelo, verde, azul e magenta. As bandas de brilho marcam \(|f(z)|\) a duplicar.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 8 · CRITÉRIO DOS LIMITES -->
+<section class="slide" data-id="limites" data-title="Critério dos limites" data-sec="Revisão">
+<div class="wrap">
+  <h2>Classificar sem a série: o critério dos limites</h2>
+  <div class="cols">
+    <div>
+      <div class="box prop"><span class="k">Proposição (Prop. 4.35)</span>Seja \(a\) uma singularidade isolada de \(f\).
+        <ol>
+          <li>Se \(\displaystyle\lim_{z\to a}(z-a)f(z)=0\), então \(a\) é uma singularidade removível.</li>
+          <li>Se existem \(m\in\N\) e \(c\in\C\setminus\{0\}\) tais que \(\displaystyle\lim_{z\to a}(z-a)^mf(z)=c\), então \(a\) é um polo de ordem \(m\).</li>
+        </ol>
+      </div>
+      <div class="box ideia step"><span class="k">Ideia</span>Multiplicar por \((z-a)^m\) empurra a série \(m\) casas para a direita: \((z-a)^mf(z)=c_{-m}+c_{-m+1}(z-a)+\cdots\to c_{-m}\neq0\).</div>
+      <div class="box erro step"><span class="k">Erro frequente</span>A ordem do polo <b>só</b> é o expoente do denominador se o numerador não se anular nesse ponto. Por exemplo, \(\frac{z^2-1}{z-1}\) tem uma singularidade removível em \(1\).</div>
+    </div>
+    <div class="panel step">
+      <h3>Teste: \(f(z)=\dfrac{\sen z}{z^3}\) em \(a=0\)</h3>
+      <div class="seg" data-stack="lim" role="group" aria-label="Escolher m"><button>\(m=1\)</button><button>\(m=2\)</button><button>\(m=3\)</button><button>\(m=4\)</button></div>
+      <div class="stack" data-stackof="lim">
+        <div>\[\Big|z\,\frac{\sen z}{z^3}\Big|=\Big|\frac{\sen z}{z}\Big|\cdot\frac{1}{|z|}\to+\infty\]<p class="bad">O limite não existe em \(\C\): potência pequena demais.</p></div>
+        <div>\[\lim_{z\to0}z^2\,\frac{\sen z}{z^3}=\lim_{z\to0}\frac{\sen z}{z}=1\neq0\]<p class="good">✓ \(c=1\neq0\): \(0\) é um polo de ordem \(2\).</p></div>
+        <div>\[\lim_{z\to0}z^3\,\frac{\sen z}{z^3}=\lim_{z\to0}\sen z=0\]<p class="bad">Dá \(0\): potência grande demais (o critério exige \(c\neq0\)).</p></div>
+        <div>\[\lim_{z\to0}z^4\,\frac{\sen z}{z^3}=\lim_{z\to0}z\sen z=0\]<p class="bad">Também dá \(0\).</p></div>
+      </div>
+      <p class="small muted">Só um valor de \(m\) dá um limite finito e não nulo: é a ordem do polo.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 9 · QUIZ -->
+<section class="slide" data-id="treino" data-title="Treino: classificar singularidades" data-sec="Revisão" data-w="quiz">
+<div class="wrap">
+  <h2>Treino: qual é o tipo de singularidade?</h2>
+  <div class="cols c64">
+    <div class="panel">
+      <div class="qf" data-out="q"></div>
+      <div class="opts" data-out="opts"></div>
+      <div class="fb" data-out="fb"></div>
+      <div class="ctrl"><button class="btn primary" data-act="new">Nova função</button><span class="mono small muted" data-out="score"></span></div>
+    </div>
+    <div class="box nota"><span class="k">Estratégia</span>
+      <ol>
+        <li>O numerador anula-se em \(a\)? Se não, a ordem do polo é o expoente de \(z-a\) no denominador.</li>
+        <li>Se sim, aplicar o critério dos limites com vários \(m\), ou escrever a série de Laurent.</li>
+        <li>\(e^{1/z}\), \(\sen\frac1z\), \(\cos\frac1z\) em \(0\): a série tem infinitas potências negativas, logo é essencial.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 10 · RESÍDUO -->
+<section class="slide" data-id="residuo" data-title="Resíduo" data-sec="Revisão" data-w="wind">
+<div class="wrap">
+  <h2>Resíduo: o que resta depois de integrar</h2>
+  <div class="cols">
+    <div>
+      <div class="box def"><span class="k">Definição (Def. 4.40)</span>Se \(a\) é uma singularidade isolada de \(f\), o <b>resíduo</b> de \(f\) em \(a\) é
+        \[\Res(f,a)=\frac{1}{2\pi i}\int_\gamma f,\qquad \gamma(t)=a+re^{it},\ t\in[0,2\pi],\]
+        com \(r\gt0\) pequeno (sem outras singularidades dentro de \(\gamma\)).</div>
+      <div class="box prop step"><span class="k">Proposição (Prop. 4.41)</span>\(\Res(f,a)=c_{-1}\), o coeficiente de \(\dfrac{1}{z-a}\) na série de Laurent de \(f\) em \(0\lt|z-a|\lt r\).</div>
+      <div class="box ideia step"><span class="k">Porquê?</span>\(\displaystyle\int_{|z-a|=r}(z-a)^n\,dz=\begin{cases}2\pi i,& n=-1\\ 0,& n\neq-1\end{cases}\). Integrando a série termo a termo, só \(\frac{c_{-1}}{z-a}\) sobrevive.</div>
+    </div>
+    <div class="panel step">
+      <h3>Acumular \(\int (z-a)^n\,dz\) ao longo de \(|z-a|=1\)</h3>
+      <div class="seg" data-out="nseg" role="group" aria-label="Escolher n"></div>
+      <div class="cols" style="gap:.6em;grid-template-columns:minmax(0,.8fr) minmax(0,1fr)">
+        <svg class="fig wl" style="max-height:30vh" viewBox="0 0 200 200" aria-label="Ponto a percorrer a circunferência"></svg>
+        <svg class="fig wr" style="max-height:34vh" viewBox="0 0 230 280" aria-label="Valor acumulado do integral"></svg>
+      </div>
+      <div class="ctrl"><button class="btn primary" data-act="play">▶ Dar a volta</button><span class="mono small" data-out="val"></span></div>
+      <div data-out="res" class="small" style="min-height:2.4em"></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 11 · CÁLCULO DE RESÍDUOS -->
+<section class="slide" data-id="calculo" data-title="Calcular resíduos em polos" data-sec="Revisão">
+<div class="wrap">
+  <h2>Calcular resíduos</h2>
+  <div class="cols">
+    <div>
+      <div class="box prop"><span class="k">Proposição (Prop. 4.43)</span>Se \(a\) é um polo de ordem \(m\) de \(f\), então
+        \[\Res(f,a)=\lim_{z\to a}\frac{1}{(m-1)!}\Big((z-a)^mf(z)\Big)^{(m-1)}.\]
+        Em particular, num <b>polo simples</b>: \(\ \Res(f,a)=\displaystyle\lim_{z\to a}(z-a)f(z)\).</div>
+      <div class="box nota step"><span class="k">Como escolher o método</span>
+        <ul>
+          <li>polo simples: \(\lim_{z\to a}(z-a)f(z)\);</li>
+          <li>polo de ordem \(2\) ou \(3\): a fórmula com a derivada de ordem \(m-1\);</li>
+          <li>essencial (ou polo de ordem alta): série de Laurent, e ler \(c_{-1}\);</li>
+          <li>removível: \(\Res=0\).</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="box ex step"><span class="k">Polo simples</span>\(f(z)=\frac{z}{1+z^2}=\frac{z}{(z-i)(z+i)}\): \(\ \Res(f,i)=\lim_{z\to i}\frac{z}{z+i}=\frac{i}{2i}=\frac12\).</div>
+      <div class="box ex step"><span class="k">Polo de ordem 2</span>\(f(z)=\frac{1}{z^2(z-1)}\): \(\ \Res(f,0)=\lim_{z\to0}\big(\frac{1}{z-1}\big)'=\lim_{z\to0}\frac{-1}{(z-1)^2}=-1\).</div>
+      <div class="box ex step"><span class="k">Pela série</span>\(\frac{\cos z}{z^3}=\frac{1}{z^3}\big(1-\frac{z^2}{2}+\frac{z^4}{24}-\cdots\big)=\frac1{z^3}\class{pp}{-\frac{1}{2z}}+\cdots\), logo \(\Res=-\frac12\).</div>
+      <div class="box ex step"><span class="k">Essencial</span>\(e^{1/z}=1+\class{pp}{\frac1z}+\frac{1}{2z^2}+\cdots\), logo \(\Res(e^{1/z},0)=1\). E \(\Res\big(\frac{\sen z}{z^3},0\big)=0\): um polo pode ter resíduo nulo.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 12 · TEOREMA DOS RESÍDUOS -->
+<section class="slide" data-id="teorema" data-title="Teorema dos resíduos" data-sec="Revisão" data-w="rt">
+<div class="wrap">
+  <h2>O teorema dos resíduos</h2>
+  <div class="cols">
+    <div>
+      <div class="box teo"><span class="k">Teorema (cf. Teo. 4.48)</span>Seja \(\Omega\subset\C\) um aberto simplesmente conexo e sejam \(a_1,\dots,a_n\in\Omega\). Se \(f\) é holomorfa em \(\Omega\setminus\{a_1,\dots,a_n\}\) e \(\gamma\) é um caminho fechado seccionalmente regular em \(\Omega\setminus\{a_1,\dots,a_n\}\), então
+        \[\int_\gamma f=2\pi i\sum_{k=1}^{n}\Res(f,a_k)\,\Ind_\gamma(a_k).\]</div>
+      <div class="box nota step"><span class="k">Na prática</span>Circunferência percorrida \(k\) vezes no sentido positivo: \(\Ind_\gamma=k\) dentro e \(0\) fora (\(-k\) no sentido negativo). Compara-se \(|a-z_0|\) com o raio.</div>
+      <div class="panel step" style="padding:.5em .8em">
+        <div class="tbl-wrap"><table class="vals">
+          <tr><th>polo \(a\)</th><th>\(\Res(f,a)\)</th><th>\(\Ind_\gamma(a)\)</th></tr>
+          <tr data-row="0"><td>\(0\)</td><td>\(-\frac{i}{2}\)</td><td class="num" data-ind="0"></td></tr>
+          <tr data-row="1"><td>\(1\)</td><td>\(\frac{1+2i}{5}\)</td><td class="num" data-ind="1"></td></tr>
+          <tr data-row="2"><td>\(2i\)</td><td>\(\frac{-2+i}{10}\)</td><td class="num" data-ind="2"></td></tr>
+        </table></div>
+      </div>
+    </div>
+    <div class="panel step">
+      <h3>Experimente: \(f(z)=\frac{1}{z(z-1)(z-2i)}\)</h3>
+      <p class="tiny muted" style="margin:0">Arraste para mover o centro; mude o raio e o número de voltas.</p>
+      <svg class="fig rt-svg nosw" viewBox="0 0 420 300" style="touch-action:none;cursor:grab;max-height:32vh" aria-label="Circunferência arrastável e os polos 0, 1 e 2i"></svg>
+      <div class="ctrl"><label>raio <input type="range" min="20" max="340" value="150" data-in="r" aria-label="Raio"></label><span class="mono small" data-out="r"></span></div>
+      <div class="seg" data-out="kseg" role="group" aria-label="Número de voltas"></div>
+      <div data-out="tot" style="min-height:2.4em"></div>
+      <div class="check" data-out="num"></div>
+      <div class="warn" data-out="warn"></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 13 · EXERCÍCIO ALEATÓRIO 1 -->
+<section class="slide" data-id="exercicio-caminho" data-title="Exercício: integral num caminho fechado" data-sec="Revisão" data-w="exo">
+<div class="wrap">
+  <h2>Exercício aleatório: integral num caminho fechado</h2>
+  <div class="cols c46">
+    <div class="panel">
+      <div class="enun" data-out="enun"></div>
+      <svg class="fig" data-out="fig" viewBox="0 0 300 300" style="max-height:40vh" aria-label="Caminho e singularidades"></svg>
+    </div>
+    <div>
+      <div class="xsteps" data-out="steps"></div>
+      <div class="ctrl"><button class="btn primary" data-act="next">Passo seguinte</button><button class="btn" data-act="all">Mostrar tudo</button><button class="btn" data-act="new">↻ Novo exercício</button></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 14 · O PROBLEMA -->
+<section class="slide" data-id="problema" data-title="Integrais impróprios: o problema" data-sec="Integrais impróprios">
+<div class="wrap">
+  <h2>Integrais impróprios: a ideia</h2>
+  <div class="cols c64 mid">
+    <div>
+      <p>Queremos calcular \(\displaystyle\int_{-\infty}^{+\infty}\frac{x+1}{(x^2+1)(x^2+4)}\,dx\). Quando o integral converge,</p>
+      \[\int_{-\infty}^{+\infty}f(x)\,dx=\lim_{R\to+\infty}\int_{-R}^{R}f(x)\,dx.\]
+      <div class="box ideia step"><span class="k">Ideia</span>O segmento \([-R,R]\) é “metade” de um <b>caminho fechado</b>: o segmento mais a semicircunferência \(C_R\). No caminho fechado usamos o teorema dos resíduos. Quando \(R\to+\infty\), o integral em \(C_R\) desaparece e fica só o integral real.</div>
+      <div class="box nota step"><span class="k">O caminho</span>\(\gamma_1(t)=t,\ t\in[-R,R]\) \(\quad\) e \(\quad\gamma_2(t)=Re^{it},\ t\in[0,\pi]\). Só contam as singularidades <b>no semiplano superior</b> (\(\Im a\gt0\)).</div>
+    </div>
+    <figure class="step">
+      <svg class="fig" viewBox="0 0 360 230" aria-label="Segmento de −R a R e semicircunferência">
+        <rect x="0" y="0" width="360" height="190" class="areaA"/>
+        <line class="ax" x1="10" y1="190" x2="350" y2="190"/><line class="ax" x1="180" y1="228" x2="180" y2="8"/>
+        <path class="cur draw" pathLength="1" d="M40 190 L320 190 A140 140 0 0 0 40 190"/>
+        <path d="M262 190 l-12 -6 l0 12z" class="ah"/><path d="M0 0 L-11 -6 L-11 6Z" transform="translate(81 91) rotate(135)" class="ah"/>
+        <circle class="pole" cx="180" cy="148" r="6"/><circle class="pole" cx="180" cy="106" r="6"/>
+        <circle class="pole out" cx="180" cy="232" r="5"/>
+        <text class="m" x="190" y="152">i</text><text class="m" x="190" y="110">2i</text>
+        <text class="m" x="30" y="210">−R</text><text class="m" x="314" y="210">R</text>
+        <text class="m" x="226" y="208" style="fill:var(--teal)">γ<tspan dy="4" font-size="11">1</tspan></text><text class="m" x="290" y="74" style="fill:var(--teal)">γ<tspan dy="4" font-size="11">2</tspan><tspan dy="-4"> = C</tspan><tspan dy="4" font-size="11">R</tspan></text>
+        <text class="lbl" x="18" y="20">semiplano superior</text>
+      </svg>
+    </figure>
+  </div>
+</div>
+</section>
+
+<!-- 15 · SEMICÍRCULO INTERATIVO -->
+<section class="slide" data-id="semicirculo" data-title="O semicírculo a crescer" data-sec="Integrais impróprios" data-w="semi">
+<div class="wrap">
+  <h2>O semicírculo a crescer</h2>
+  <p class="muted small" style="margin-top:-.3em">\(f(z)=\frac{z+1}{(z^2+1)(z^2+4)}\), com polos simples em \(\pm i\) e \(\pm 2i\).</p>
+  <div class="cols c46">
+    <div class="panel nosw">
+      <svg class="fig semi-svg" viewBox="0 0 400 230" aria-label="Caminho com raio R e os polos i e 2i"></svg>
+      <div class="ctrl"><button class="btn primary" data-act="play">▶ Aumentar R</button><input type="range" min="0" max="1000" value="107" aria-label="Raio R"><span class="mono" data-out="R"></span></div>
+      <div class="warn" data-out="warn"></div>
+    </div>
+    <div>
+      <div class="tbl-wrap"><table class="vals">
+        <tr><td>\(\displaystyle\int_{-R}^{R}f(x)\,dx\)</td><td class="num" data-out="seg"></td></tr>
+        <tr><td>\(\displaystyle\int_{C_R}f(z)\,dz\)</td><td class="num" data-out="arc"></td></tr>
+        <tr class="hl"><td>soma (caminho fechado)</td><td class="num" data-out="sum"></td></tr>
+        <tr class="hl"><td>\(2\pi i\sum\Res\) (polos dentro)</td><td class="num" data-out="res"></td></tr>
+      </table></div>
+      <p class="small" data-out="inside"></p>
+      <svg class="fig spark" viewBox="0 0 400 120" aria-label="Módulo do integral no arco em função de R"></svg>
+      <p class="tiny muted" style="margin-top:0">\(\big|\int_{C_R}f\big|\) em função de \(R\) (para \(R\gt2\)): tende para \(0\). Com \(R\gt2\), a soma fica sempre igual a \(\frac{\pi}{6}\approx0{,}5236\).</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 16 · O ARCO DESAPARECE -->
+<section class="slide" data-id="arco" data-title="Porque é que o arco desaparece" data-sec="Integrais impróprios">
+<div class="wrap">
+  <h2>Porque é que o integral em \(C_R\) tende para \(0\)?</h2>
+  <div class="cols">
+    <div>
+      <p>Usamos \(\big|\int_\gamma f\big|\le L(\gamma)\cdot\max_{z\in\gamma}|f(z)|\), com \(L(C_R)=\pi R\), e as desigualdades triangulares \(|z+1|\le|z|+1\), \(|z^2+a^2|\ge|z|^2-a^2\).</p>
+      <div class="box ex step"><span class="k">No exemplo, para \(|z|=R\gt2\)</span>
+        \[\Big|\int_{C_R}\frac{z+1}{(z^2+1)(z^2+4)}\,dz\Big|\le\pi R\cdot\frac{R+1}{(R^2-1)(R^2-4)},\]que tende para \(0\) quando \(R\to+\infty\).</div>
+      <div class="box ideia step"><span class="k">Regra geral</span>Se \(f=\frac PQ\) com \(\deg Q\ge\deg P+2\), então \(|f(z)|\le\frac{C}{R^2}\) no arco e \(\big|\int_{C_R}f\big|\le\pi R\cdot\frac{C}{R^2}\to0\).</div>
+    </div>
+    <div class="panel step">
+      <h3>E se a diferença de graus for menor?</h3>
+      <div class="seg" data-stack="deg" role="group" aria-label="Diferença de graus"><button>\(\deg Q-\deg P=1\)</button><button>\(=2\)</button><button>\(=3\)</button></div>
+      <div class="stack" data-stackof="deg">
+        <div><p>\(|f|\le\frac{C}{R}\) e a estimativa dá \(\pi R\cdot\frac{C}{R}=\pi C\): <b class="bad">não tende para 0</b>.</p><p class="small">Ex.: \(\int_{-\infty}^{+\infty}\frac{x}{x^2+1}\,dx\) nem sequer converge (\(\int_0^{R}\frac{x}{x^2+1}dx=\frac12\ln(R^2+1)\)).</p></div>
+        <div><p>\(|f|\le\frac{C}{R^2}\) e \(\pi R\cdot\frac{C}{R^2}=\frac{\pi C}{R}\to0\). <b class="good">✓ É o caso do Projeto 1.</b></p><p class="small">Ex.: \(\frac{x^2}{(x^2+1)(x^2+4)}\), \(\frac{1}{x^2+1}\).</p></div>
+        <div><p>\(|f|\le\frac{C}{R^3}\) e \(\pi R\cdot\frac{C}{R^3}=\frac{\pi C}{R^2}\to0\). <b class="good">✓ Ainda mais depressa.</b></p><p class="small">Ex.: \(\frac{x+1}{(x^2+1)(x^2+4)}\), \(\frac{1}{x^4+1}\) (diferença \(4\)).</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 17 · RECEITA -->
+<section class="slide" data-id="receita" data-title="A receita geral" data-sec="Integrais impróprios">
+<div class="wrap">
+  <h2>A receita geral</h2>
+  <div class="cols c46">
+    <div>
+      <div class="box teo"><span class="k">Resultado (funções racionais)</span>Se \(f=\frac{P}{Q}\), com \(P,Q\) polinómios, \(\deg Q\ge\deg P+2\) e \(Q\) sem zeros reais, então
+        \[\int_{-\infty}^{+\infty}f(x)\,dx=2\pi i\sum_{\Im a\gt0}\Res(f,a).\]</div>
+      <div class="box erro step"><span class="k">Erros frequentes</span>Somar também os resíduos do semiplano inferior; esquecer o fator \(2\pi i\). <b>Se o resultado não for real, há um erro nas contas.</b></div>
+    </div>
+    <div class="panel">
+      <ol>
+        <li class="step">Escrever \(f(z)\) (trocar \(x\) por \(z\)) e encontrar as singularidades: zeros de \(Q\).</li>
+        <li class="step">Ficar só com as que têm \(\Im a\gt0\).</li>
+        <li class="step">Classificar cada uma (ordem do polo) e calcular o resíduo.</li>
+        <li class="step">\(\int_{-\infty}^{+\infty}f(x)\,dx=2\pi i\times(\text{soma desses resíduos})\), porque o arco desaparece.</li>
+        <li class="step">Se o integral é em \([0,+\infty[\) ou \(]-\infty,0]\) e \(f\) é <b>par</b>, dividir por \(2\).</li>
+        <li class="step"><b>Verificar</b>: o resultado tem de ser real (e positivo, se \(f\gt0\)).</li>
+      </ol>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 18 · EXEMPLO 1 -->
+<section class="slide" data-id="exemplo1" data-title="Exemplo: dois polos simples" data-sec="Integrais impróprios">
+<div class="wrap">
+  <h2>Exemplo 1: \(\int_{-\infty}^{+\infty}\frac{x+1}{(x^2+1)(x^2+4)}\,dx\)</h2>
+  <div class="cols">
+    <div>
+      <div class="xstep step"><span class="xs-k">Singularidades</span>\(f(z)=\dfrac{z+1}{(z^2+1)(z^2+4)}\) tem polos simples em \(\pm i\) e \(\pm2i\). No semiplano superior: \(\class{pp}{i}\) e \(\class{pp}{2i}\). Como \(\deg Q=4\ge\deg P+2=3\), o arco desaparece.</div>
+      <div class="xstep step"><span class="xs-k">Resíduo em \(i\)</span>\[\Res(f,i)=\lim_{z\to i}\frac{z+1}{(z+i)(z^2+4)}=\frac{1+i}{2i\cdot3}=\frac{1+i}{6i}\]</div>
+      <div class="xstep step"><span class="xs-k">Resíduo em \(2i\)</span>\[\Res(f,2i)=\lim_{z\to2i}\frac{z+1}{(z^2+1)(z+2i)}=\frac{1+2i}{(-3)\cdot4i}=-\frac{1+2i}{12i}\]</div>
+    </div>
+    <div>
+      <div class="xstep step"><span class="xs-k">Soma</span>\[\Res(f,i)+\Res(f,2i)=\frac{2+2i-1-2i}{12i}=\frac{1}{12i}\]</div>
+      <div class="xstep fin step"><span class="xs-k">Resultado</span>\[\int_{-\infty}^{+\infty}\frac{x+1}{(x^2+1)(x^2+4)}\,dx=2\pi i\cdot\frac{1}{12i}=\frac{\pi}{6}\]</div>
+      <div class="box nota step"><span class="k">Verificação</span>A parte ímpar \(\frac{x}{(x^2+1)(x^2+4)}\) tem integral nulo, e \(\frac{1}{(x^2+1)(x^2+4)}=\frac13\big(\frac{1}{x^2+1}-\frac{1}{x^2+4}\big)\) dá \(\frac13\big(\pi-\frac\pi2\big)=\frac\pi6\). ✓</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 19 · EXEMPLO 2 -->
+<section class="slide" data-id="exemplo2" data-title="Exemplo: polo duplo e meia reta" data-sec="Integrais impróprios">
+<div class="wrap">
+  <h2>Exemplo 2: \(\int_{0}^{+\infty}\frac{dx}{(x^2+1)^2}\)</h2>
+  <div class="cols">
+    <div>
+      <div class="xstep step"><span class="xs-k">Paridade</span>A função é <b>par</b>, logo \(\displaystyle\int_0^{+\infty}=\frac12\int_{-\infty}^{+\infty}\).</div>
+      <div class="xstep step"><span class="xs-k">Singularidades</span>\(f(z)=\dfrac{1}{(z^2+1)^2}=\dfrac{1}{(z-i)^2(z+i)^2}\). No semiplano superior só está \(\class{pp}{i}\): \(\lim_{z\to i}(z-i)^2f(z)=\frac{1}{(2i)^2}=-\frac14\neq0\), polo de ordem \(2\).</div>
+    </div>
+    <div>
+      <div class="xstep step"><span class="xs-k">Resíduo (polo de ordem 2)</span>\[\Res(f,i)=\lim_{z\to i}\Big(\frac{1}{(z+i)^2}\Big)'=\lim_{z\to i}\frac{-2}{(z+i)^3}=\frac{-2}{(2i)^3}=\frac{1}{4i}\]</div>
+      <div class="xstep fin step"><span class="xs-k">Resultado</span>\[\int_{-\infty}^{+\infty}\frac{dx}{(x^2+1)^2}=2\pi i\cdot\frac{1}{4i}=\frac\pi2\quad\Longrightarrow\quad\int_{0}^{+\infty}\frac{dx}{(x^2+1)^2}=\frac{\pi}{4}\]</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 20 · EXEMPLO 3 -->
+<section class="slide" data-id="exemplo3" data-title="Exemplo: x⁴ + 1" data-sec="Integrais impróprios" data-w="roots">
+<div class="wrap">
+  <h2>Exemplo 3: \(\int_{-\infty}^{+\infty}\frac{dx}{x^4+1}\)</h2>
+  <div class="cols c46 mid">
+    <div class="panel">
+      <svg class="fig" viewBox="0 0 300 300" style="max-height:46vh" aria-label="As quatro raízes de z^4 = −1"></svg>
+      <div class="ctrl" style="justify-content:center"><button class="btn primary" data-act="play">▶ Raízes de \(z^4=-1\)</button></div>
+    </div>
+    <div>
+      <div class="xstep step"><span class="xs-k">Singularidades</span>\(z^4=-1=e^{i\pi}\iff z=e^{i(\frac\pi4+\frac{k\pi}{2})}\), \(k=0,1,2,3\). No semiplano superior: \(a_1=e^{i\pi/4}=\frac{\sqrt2}{2}(1+i)\) e \(a_2=e^{i3\pi/4}=\frac{\sqrt2}{2}(-1+i)\), polos simples.</div>
+      <div class="xstep step"><span class="xs-k">Resíduos (definição de derivada)</span>Como \(a^4+1=0\),
+        \[\Res(f,a)=\lim_{z\to a}\frac{z-a}{z^4+1}=\lim_{z\to a}\frac{1}{\frac{(z^4+1)-(a^4+1)}{z-a}}=\frac{1}{4a^3}=\frac{a}{4a^4}=-\frac{a}{4}.\]</div>
+      <div class="xstep fin step"><span class="xs-k">Resultado</span>\[\int_{-\infty}^{+\infty}\frac{dx}{x^4+1}=2\pi i\Big(-\frac{a_1+a_2}{4}\Big)=2\pi i\Big(-\frac{i\sqrt2}{4}\Big)=\frac{\pi\sqrt2}{2}\]</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 21 · EXERCÍCIO ALEATÓRIO 2 -->
+<section class="slide" data-id="exercicio-improprio" data-title="Exercício: integral impróprio" data-sec="Integrais impróprios" data-w="exi">
+<div class="wrap">
+  <h2>Exercício aleatório: integral impróprio (tipo Projeto 1)</h2>
+  <div class="cols c46">
+    <div class="panel">
+      <div class="enun" data-out="enun"></div>
+      <svg class="fig" data-out="fig" viewBox="0 0 300 200" style="max-height:30vh" aria-label="Singularidades e semicircunferência"></svg>
+      <div class="ctrl"><span class="hint">Tipo:</span><span class="seg" data-out="fam" style="margin:0" role="group" aria-label="Tipo de exercício"></span></div>
+    </div>
+    <div>
+      <div class="xsteps" data-out="steps"></div>
+      <div class="ctrl"><button class="btn primary" data-act="next">Passo seguinte</button><button class="btn" data-act="all">Mostrar tudo</button><button class="btn" data-act="new">↻ Novo exercício</button></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 22 · OUTRAS APLICAÇÕES -->
+<section class="slide" data-id="aplicacoes" data-title="Outras aplicações" data-sec="Outras aplicações">
+<div class="wrap">
+  <h2>Outras aplicações do teorema dos resíduos</h2>
+  <div class="cols3">
+    <div class="card linkcard step" data-go="trigonometricos" style="--c:var(--teal)">
+      <h3>Integrais trigonométricos</h3>
+      \[\int_0^{2\pi}R(\cos t,\sen t)\,dt\]
+      <p class="small">Com \(z=e^{it}\), passa a ser o integral de uma função racional em \(|z|=1\).</p>
+    </div>
+    <div class="card linkcard step" data-go="fourier" style="--c:var(--accent)">
+      <h3>Integrais com \(\cos x\) e \(\sen x\)</h3>
+      \[\int_{-\infty}^{+\infty}\frac{\cos x}{x^2+1}\,dx\]
+      <p class="small">Usar \(e^{iz}\) em vez de \(\cos z\). São transformadas de Fourier.</p>
+    </div>
+    <div class="card linkcard step" data-go="edo" style="--c:var(--purple)">
+      <h3>Ponte para as EDO</h3>
+      \[x''-2x'+5x=0\ \rightsquigarrow\ \lambda=1\pm2i\]
+      <p class="small">A posição das raízes no plano complexo decide o comportamento das soluções. A transformada de Laplace inverte-se com resíduos.</p>
+    </div>
+  </div>
+  <div class="box nota step" style="margin-top:1em"><span class="k">Para quem quiser ir mais longe</span>\(\int_0^{+\infty}\frac{\sen x}{x}\,dx=\frac\pi2\) (contorno com uma “indentação” em \(0\), Ex. 4.51); o princípio do argumento (contar zeros e polos com um integral); somas de séries, como \(\sum_{n\ge1}\frac{1}{n^2}=\frac{\pi^2}{6}\), com os resíduos de \(\frac{\pi\cot(\pi z)}{z^2}\).</div>
+</div>
+</section>
+
+<!-- 23 · TRIGONOMÉTRICOS -->
+<section class="slide" data-id="trigonometricos" data-title="Integrais trigonométricos" data-sec="Outras aplicações" data-w="trig">
+<div class="wrap">
+  <h2>Integrais trigonométricos: \(\int_0^{2\pi}\frac{dt}{2+\cos t}\)</h2>
+  <div class="cols c46">
+    <div class="panel">
+      <svg class="fig tg" style="max-height:24vh" viewBox="0 0 360 170" aria-label="Gráfico de 1/(2+cos t)"></svg>
+      <svg class="fig tc" style="max-height:26vh" viewBox="0 0 360 190" aria-label="z = e^{it} a percorrer a circunferência unitária"></svg>
+      <p class="tiny muted" style="margin:0" data-out="t"></p>
+    </div>
+    <div>
+      <div class="box nota"><span class="k">Substituição \(z=e^{it}\), \(t\in[0,2\pi]\)</span>O caminho é \(|z|=1\), uma volta no sentido positivo, e
+        \[\cos t=\frac{z+z^{-1}}{2},\qquad \sen t=\frac{z-z^{-1}}{2i},\qquad dt=\frac{dz}{iz}.\]</div>
+      <div class="xstep step"><span class="xs-k">Transformar</span>\[\int_0^{2\pi}\frac{dt}{2+\cos t}=\int_{|z|=1}\frac{1}{2+\frac{z+z^{-1}}{2}}\cdot\frac{dz}{iz}=\int_{|z|=1}\frac{2}{i(z^2+4z+1)}\,dz\]</div>
+      <div class="xstep step"><span class="xs-k">Polos</span>\(z^2+4z+1=0\iff z=-2\pm\sqrt3\). Só \(\class{pp}{z_1=-2+\sqrt3}\approx-0{,}27\) está dentro de \(|z|=1\).</div>
+      <div class="xstep fin step"><span class="xs-k">Resíduo e resultado</span>\(\Res=\dfrac{2}{i(z_1-z_2)}=\dfrac{2}{i\cdot2\sqrt3}=\dfrac{1}{i\sqrt3}\), logo \(\displaystyle\int_0^{2\pi}\frac{dt}{2+\cos t}=2\pi i\cdot\frac{1}{i\sqrt3}=\frac{2\pi}{\sqrt3}\).</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 24 · EXERCÍCIO ALEATÓRIO 3 -->
+<section class="slide" data-id="exercicio-trig" data-title="Exercício: integral trigonométrico" data-sec="Outras aplicações" data-w="ext">
+<div class="wrap">
+  <h2>Exercício aleatório: integral trigonométrico</h2>
+  <div class="cols c46">
+    <div class="panel">
+      <div class="enun" data-out="enun"></div>
+      <svg class="fig" data-out="fig" viewBox="0 0 300 220" style="max-height:34vh" aria-label="Circunferência unitária e polos"></svg>
+    </div>
+    <div>
+      <div class="xsteps" data-out="steps"></div>
+      <div class="ctrl"><button class="btn primary" data-act="next">Passo seguinte</button><button class="btn" data-act="all">Mostrar tudo</button><button class="btn" data-act="new">↻ Novo exercício</button></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 25 · e^{iz} -->
+<section class="slide" data-id="fourier" data-title="Integrais com cos x e sen x" data-sec="Outras aplicações" data-w="eiz">
+<div class="wrap">
+  <h2>Integrais com \(\cos x\): usar \(e^{iz}\)</h2>
+  <div class="cols c46">
+    <div class="panel nosw">
+      <h3>\(|\cos z|\) e \(|e^{iz}|\) ao longo da reta \(\Im z=y\)</h3>
+      <svg class="fig ez" viewBox="0 0 380 220" aria-label="Módulos de cos z e de e^{iz}"></svg>
+      <div class="ctrl"><label>\(y=\Im z\) <input type="range" min="0" max="300" value="0" aria-label="Parte imaginária"></label><span class="mono small" data-out="y"></span></div>
+      <p class="tiny" data-out="txt"></p>
+    </div>
+    <div>
+      <p>Para \(\displaystyle\int_{-\infty}^{+\infty}\frac{\cos x}{x^2+1}\,dx\), a função \(\frac{\cos z}{z^2+1}\) <b>não</b> serve: \(|\cos z|\) cresce como \(\frac{e^{y}}{2}\) no semiplano superior e o arco não desaparece.</p>
+      <div class="box ideia step"><span class="k">Truque</span>\(\cos x=\Re\,e^{ix}\) e \(|e^{iz}|=e^{-y}\le1\) para \(y\ge0\). Usamos \(f(z)=\dfrac{e^{iz}}{z^2+1}\), com \(\big|\int_{C_R}f\big|\le\frac{\pi R}{R^2-1}\to0\).</div>
+      <div class="xstep step"><span class="xs-k">Resíduo</span>\(\Res(f,i)=\displaystyle\lim_{z\to i}\frac{e^{iz}}{z+i}=\frac{e^{-1}}{2i}\), logo \(\displaystyle\int_{-\infty}^{+\infty}\frac{e^{ix}}{x^2+1}\,dx=2\pi i\cdot\frac{e^{-1}}{2i}=\frac{\pi}{e}\).</div>
+      <div class="xstep fin step"><span class="xs-k">Partes real e imaginária</span>\[\int_{-\infty}^{+\infty}\frac{\cos x}{x^2+1}\,dx=\frac{\pi}{e},\qquad\int_{-\infty}^{+\infty}\frac{\sen x}{x^2+1}\,dx=0.\]</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 26 · EDO -->
+<section class="slide" data-id="edo" data-title="Ponte para as EDO" data-sec="Outras aplicações" data-w="edo">
+<div class="wrap">
+  <h2>Ponte para as EDO: onde está \(\lambda\) no plano complexo?</h2>
+  <div class="cols c64">
+    <div class="panel nosw">
+      <div class="cols" style="gap:.6em;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr)">
+        <svg class="fig lp" viewBox="0 0 240 260" style="touch-action:none;cursor:grab" aria-label="Plano complexo com a raiz λ arrastável"></svg>
+        <svg class="fig lx" viewBox="0 0 320 260" aria-label="Gráfico da solução x(t)"></svg>
+      </div>
+      <p class="small mono" data-out="lam" style="margin:.3em 0 0"></p>
+      <p class="small" data-out="eq" style="margin:.2em 0 0"></p>
+    </div>
+    <div>
+      <p>Na EDO linear \(x''+a_1x'+a_0x=0\), procuramos soluções \(e^{\lambda t}\), com \(\lambda\) raiz do <b>polinómio característico</b> \(p(\lambda)=\lambda^2+a_1\lambda+a_0\).</p>
+      <div class="box ideia step"><span class="k">Raízes complexas</span>Se \(\lambda=a\pm ib\), a fórmula de Euler \(e^{(a+ib)t}=e^{at}(\cos bt+i\sen bt)\) dá as soluções reais \(e^{at}\cos bt\) e \(e^{at}\sen bt\).</div>
+      <div class="box nota step"><span class="k">Arraste \(\lambda\)</span>\(\Re\lambda\lt0\): as soluções decaem. \(\Re\lambda\gt0\): crescem. \(\Im\lambda\neq0\): oscilam, com frequência \(b\).</div>
+      <div class="box teo step"><span class="k">Próximas aulas</span>A transformada de Laplace transforma a EDO numa equação algébrica em \(s\), com \(p(s)\) no denominador. Para voltar atrás, somam-se os <b>resíduos</b> de \(F(s)e^{st}\) nos polos.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 27 · RESUMO -->
+<section class="slide" data-id="resumo" data-title="Resumo" data-sec="Resumo">
+<div class="wrap">
+  <h2>Resumo</h2>
+  <div class="cols3">
+    <div class="card" style="--c:var(--blue)"><h3>Classificar</h3><p class="small">Zeros do denominador; critério dos limites: \(\lim_{z\to a}(z-a)^mf(z)=c\neq0\) dá um polo de ordem \(m\). Série com infinitas potências negativas: essencial.</p></div>
+    <div class="card" style="--c:var(--blue)"><h3>Calcular resíduos</h3><p class="small">Polo simples: \(\lim(z-a)f(z)\). Ordem \(m\): \(\frac{1}{(m-1)!}\lim\big((z-a)^mf\big)^{(m-1)}\). Essencial: ler \(c_{-1}\) na série.</p></div>
+    <div class="card" style="--c:var(--blue)"><h3>Teorema dos resíduos</h3><p class="small">\(\int_\gamma f=2\pi i\sum\Res(f,a_k)\Ind_\gamma(a_k)\). Só contam as singularidades dentro de \(\gamma\).</p></div>
+    <div class="card" style="--c:var(--accent)"><h3>Integrais racionais</h3><p class="small">\(\deg Q\ge\deg P+2\), \(Q\) sem zeros reais: \(\int_{-\infty}^{+\infty}\frac PQ=2\pi i\sum_{\Im a\gt0}\Res\). Se \(f\) é par, \(\int_0^{+\infty}\) é metade.</p></div>
+    <div class="card" style="--c:var(--teal)"><h3>Trigonométricos</h3><p class="small">\(z=e^{it}\), \(\cos t=\frac{z+z^{-1}}{2}\), \(\sen t=\frac{z-z^{-1}}{2i}\), \(dt=\frac{dz}{iz}\). Contam os polos em \(|z|\lt1\).</p></div>
+    <div class="card" style="--c:var(--purple)"><h3>Com \(\cos x\), \(\sen x\)</h3><p class="small">Usar \(e^{iz}\) (que é limitado no semiplano superior) e tomar a parte real ou imaginária no fim.</p></div>
+  </div>
+</div>
+</section>
+
+<!-- 28 · PARA CASA -->
+<section class="slide" data-id="para-casa" data-title="Para casa" data-sec="Resumo">
+<div class="wrap">
+  <h2>Para casa</h2>
+  <div class="cols">
+    <div>
+      <div class="box ex"><span class="k">Projeto 1</span>Os integrais impróprios do Projeto 1 resolvem-se todos com a receita de hoje. Comece pelos de denominador \((x^2+a^2)(x^2+b^2)\) e deixe para o fim os de \(x^4+a^4\).</div>
+      <div class="box nota"><span class="k">Treino</span>Os exercícios aleatórios destes diapositivos geram sempre exemplos novos, com a resolução passo a passo. No Moodle estão os exercícios de prática de resíduos.</div>
+    </div>
+    <div>
+      <div class="box def"><span class="k">Leitura</span>L. Barreira e C. Valls, <i>Complex Analysis and Differential Equations</i>, secções 4.3 a 4.5 (pp. 164–182): Laurent, classificação, resíduos e o Ex. 4.50.</div>
+      <div class="box ideia"><span class="k">Pergunta para pensar</span>Porque é que \(\int_{-\infty}^{+\infty}\frac{dx}{x^2+1}\) dá o mesmo resultado se fecharmos o caminho com uma semicircunferência no semiplano <b>inferior</b>? (Cuidado com o sentido do caminho.)</div>
+    </div>
+  </div>
+</div>
+</section>
+
+</main>
+
+<nav class="bottombar" aria-label="Navegação">
+  <div class="bb-in">
+    <button class="nbtn round" id="bPrev" aria-label="Anterior"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <span class="counter" id="counter">1 / 28</span>
+    <button class="nbtn round" id="bNext" aria-label="Seguinte"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+    <span class="sp"></span>
+    <button class="nbtn" id="bIdx" aria-label="Índice"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span class="lb">Índice</span></button>
+    <button class="nbtn" id="bStudy" aria-pressed="false" aria-label="Modo estudo: mostrar todos os passos"><svg viewBox="0 0 24 24"><path d="M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2zM22 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z"/></svg><span class="lb">Modo estudo</span></button>
+    <button class="nbtn" id="bFs" aria-label="Ecrã inteiro"><svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span class="lb">Ecrã inteiro</span></button>
+  </div>
+</nav>
+
+<div class="idx" id="idx" hidden><div class="idx-in" role="dialog" aria-label="Índice"><div style="display:flex;align-items:center;justify-content:space-between;gap:1em"><h3>Índice</h3><button class="btn" id="idxClose">Fechar</button></div><div id="idxList"></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+/* ---------- utilitários ---------- */
+const $=(s,r)=>(r||document).querySelector(s);
+const $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
+const NS='http://www.w3.org/2000/svg';
+function S(tag,at,par){const e=document.createElementNS(NS,tag);if(at)for(const k in at)e.setAttribute(k,at[k]);if(par)par.appendChild(e);return e}
+function T(par,x,y,txt,cls,extra){const t=S('text',Object.assign({x:x,y:y},cls?{class:cls}:{},extra||{}),par);t.textContent=txt;return t}
+const rnd=n=>Math.floor(Math.random()*n), pick=a=>a[rnd(a.length)];
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const RM=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}return null}
+const AH='M0 0 L-11 -6 L-11 6Z';
+function arrowAt(el,x,y,deg){el.setAttribute('transform','translate('+x.toFixed(1)+' '+y.toFixed(1)+') rotate('+deg.toFixed(1)+')')}
+/* seta tangente a uma circunferência (coordenadas de ecrã), sentido positivo se dir>0 */
+function tanDeg(th,dir){return Math.atan2(-Math.cos(th),-Math.sin(th))*180/Math.PI+(dir>0?0:180)}
+
+/* ---------- MathJax ---------- */
+let mjQ=Promise.resolve();
+function mjReady(){return new Promise(res=>{let n=0;(function poll(){const M=window.MathJax;if(M&&M.startup&&M.startup.promise&&M.typesetPromise){M.startup.promise.then(res,res)}else if(n++<500)setTimeout(poll,50);else res()})()})}
+function fixWide(root){$$('mjx-container:not([display="true"])',root).forEach(m=>{const sv=m.firstElementChild,p=m.parentElement;if(!sv||!p)return;const w=sv.getBoundingClientRect().width,pw=p.clientWidth;if(pw>0)m.classList.toggle('wide',w>pw+1)})}
+function typeset(els){mjQ=mjQ.then(mjReady).then(()=>{if(window.MathJax&&MathJax.typesetPromise)return MathJax.typesetPromise(els)}).then(()=>{(els||[document]).forEach(e=>fixWide(e))}).catch(e=>console.warn('MathJax',e));return mjQ}
+function setTeX(el,html){try{if(window.MathJax&&MathJax.typesetClear)MathJax.typesetClear([el])}catch(e){}el.innerHTML=html;return typeset([el])}
+
+/* ---------- números ---------- */
+function fx(x,d){if(d==null)d=4;if(!isFinite(x))return '—';if(Math.abs(x)<0.5*Math.pow(10,-d))x=0;return x.toFixed(d).replace('-','−').replace('.',',')}
+function fc(re,im,d){if(d==null)d=4;const t=0.5*Math.pow(10,-d);if(Math.abs(im)<t)return fx(re,d);if(Math.abs(re)<t)return fx(im,d)+'i';return fx(re,d)+(im<0?' − ':' + ')+fx(Math.abs(im),d)+'i'}
+const C=(re,im)=>({re:re,im:im||0});
+const cadd=(a,b)=>C(a.re+b.re,a.im+b.im), csub=(a,b)=>C(a.re-b.re,a.im-b.im);
+const cmul=(a,b)=>C(a.re*b.re-a.im*b.im,a.re*b.im+a.im*b.re);
+const cdiv=(a,b)=>{const d=b.re*b.re+b.im*b.im;return C((a.re*b.re+a.im*b.im)/d,(a.im*b.re-a.re*b.im)/d)};
+const cabs=a=>Math.hypot(a.re,a.im);
+const csin=a=>C(Math.sin(a.re)*Math.cosh(a.im),Math.cos(a.re)*Math.sinh(a.im));
+function cpow(a,n){let r=C(1,0);for(let i=0;i<n;i++)r=cmul(r,a);return r}
+function cint(f,g,dg,t0,t1,N){const h=(t1-t0)/N;let sr=0,si=0;for(let j=0;j<=N;j++){const t=t0+j*h,w=(j===0||j===N)?1:(j%2?4:2);const v=cmul(f(g(t)),dg(t));sr+=w*v.re;si+=w*v.im}return C(sr*h/3,si*h/3)}
+function rint(f,a,b,N){const h=(b-a)/N;let s=0;for(let j=0;j<=N;j++){const w=(j===0||j===N)?1:(j%2?4:2);s+=w*f(a+j*h)}return s*h/3}
+
+/* ---------- aritmética exata (racionais de Gauss) ---------- */
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){const t=a%b;a=b;b=t}return a}
+function lcm(a,b){return a/gcd(a,b)*b}
+function Q(n,d){if(d===undefined)d=1;if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;return{n:n/g,d:d/g}}
+const qadd=(a,b)=>Q(a.n*b.d+b.n*a.d,a.d*b.d), qsub=(a,b)=>Q(a.n*b.d-b.n*a.d,a.d*b.d);
+const qmul=(a,b)=>Q(a.n*b.n,a.d*b.d), qdiv=(a,b)=>Q(a.n*b.d,a.d*b.n);
+function G(re,im){if(im===undefined)im=0;return{re:typeof re==='object'?re:Q(re),im:typeof im==='object'?im:Q(im)}}
+const gadd=(a,b)=>G(qadd(a.re,b.re),qadd(a.im,b.im)), gsub=(a,b)=>G(qsub(a.re,b.re),qsub(a.im,b.im));
+const gmul=(a,b)=>G(qsub(qmul(a.re,b.re),qmul(a.im,b.im)),qadd(qmul(a.re,b.im),qmul(a.im,b.re)));
+const gconj=a=>G(a.re,Q(-a.im.n,a.im.d)), gneg=a=>G(Q(-a.re.n,a.re.d),Q(-a.im.n,a.im.d));
+const gabs2=a=>qadd(qmul(a.re,a.re),qmul(a.im,a.im));
+function gdiv(a,b){const d=gabs2(b),n=gmul(a,gconj(b));return G(qdiv(n.re,d),qdiv(n.im,d))}
+const gzero=a=>a.re.n===0&&a.im.n===0;
+const gnum=a=>C(a.re.n/a.re.d,a.im.n/a.im.d);
+const gscale=(a,k)=>G(qmul(a.re,typeof k==='object'?k:Q(k)),qmul(a.im,typeof k==='object'?k:Q(k)));
+
+/* ---------- TeX de números ---------- */
+function giT(p,q){if(q===0)return String(p);const qa=Math.abs(q),qi=(qa===1?'':qa)+'i';if(p===0)return(q<0?'-':'')+qi;return p+(q<0?'-':'+')+qi}
+function cT(z){const L=lcm(z.re.d,z.im.d),p=z.re.n*(L/z.re.d),q=z.im.n*(L/z.im.d);
+  if(L===1)return giT(p,q);
+  if(q===0)return(p<0?'-':'')+'\\frac{'+Math.abs(p)+'}{'+L+'}';
+  if(p===0)return(q<0?'-':'')+'\\frac{'+(Math.abs(q)===1?'':Math.abs(q))+'i}{'+L+'}';
+  if(p<0&&q<0)return'-\\frac{'+giT(-p,-q)+'}{'+L+'}';
+  return'\\frac{'+giT(p,q)+'}{'+L+'}'}
+function par(t){return /^[0-9]+$|^[0-9]*i$|^\\frac\{[^{}]*\}\{[0-9]+\}$/.test(t)?t:'\\left('+t+'\\right)'}
+function parPow(t){return /^[0-9]+$|^i$/.test(t)?t:'('+t+')'}
+function parSub(t){return /^[0-9]+$|^[0-9]*i$/.test(t)?t:'('+t+')'}
+function piT(w){if(gzero(w))return'0';const L=lcm(w.re.d,w.im.d),p=w.re.n*(L/w.re.d),q=w.im.n*(L/w.im.d);
+  const one=(c,sy)=>{const a=Math.abs(c);return(c<0?'-':'')+(L===1?(a===1?'':a)+sy:'\\frac{'+(a===1?'':a)+sy+'}{'+L+'}')};
+  if(q===0)return one(p,'\\pi');if(p===0)return one(q,'\\pi i');
+  return L===1?'('+giT(p,q)+')\\pi':'\\frac{('+giT(p,q)+')\\pi}{'+L+'}'}
+function zm(a){if(gzero(a))return'z';const t=cT(gneg(a));return'z'+(t[0]==='-'?t:'+'+t)}
+function zpow(a,m){if(gzero(a))return m===1?'z':'z^{'+m+'}';return m===1?'('+zm(a)+')':'('+zm(a)+')^{'+m+'}'}
+function zden(a,m){return m===1?zm(a):zpow(a,m)}
+function pz(t){return t==='z'?'z':'('+t+')'}
+function txt(z){return cT(z).replace(/-/g,'−')}
+function sqrtT(d2){const r=Math.round(Math.sqrt(d2));return r*r===d2?String(r):'\\sqrt{'+d2+'}\\approx '+fx(Math.sqrt(d2),2).replace(',','{,}')}
+function polyT(s,p,q,v){const parts=[];if(s)parts.push((s===1?'':s===-1?'-':s)+v+'^2');
+  if(p)parts.push((p<0?'-':(parts.length?'+':''))+(Math.abs(p)===1?'':Math.abs(p))+v);
+  if(q)parts.push((q<0?'-':(parts.length?'+':''))+Math.abs(q));return parts.length?parts.join(''):'0'}
+const clean=t=>t.replace(/\+-/g,'-');
+
+/* ---------- motor dos diapositivos ---------- */
+const slides=$$('.slide'), W={};
+const stage=$('#stage'), secLbl=$('#secLbl'), ttlLbl=$('#ttlLbl'), counter=$('#counter'), progBar=$('#progBar');
+let cur=-1, study=false;
+{const v=store('mc-res-study');study=v===null?window.innerWidth<760:v==='1'}
+function setStudy(v){study=v;document.body.classList.toggle('study',v);$('#bStudy').setAttribute('aria-pressed',String(v));store('mc-res-study',v?'1':'0')}
+const steps=s=>$$('.step',s);
+function restartDraw(s){$$('.draw',s).forEach(p=>{p.classList.remove('run');void p.getBoundingClientRect();p.classList.add('run')})}
+function go(n,mode){n=clamp(n,0,slides.length-1);if(n===cur)return;
+  const old=slides[cur];if(old){old.classList.remove('active');const k=old.dataset.w;if(k&&W[k]&&W[k].leave)W[k].leave(old)}
+  slides.forEach((s,i)=>s.classList.toggle('past',i<n));
+  const s=slides[n];cur=n;steps(s).forEach(e=>e.classList.toggle('on',mode==='end'));
+  s.classList.add('active');s.scrollTop=0;restartDraw(s);
+  secLbl.textContent=s.dataset.sec||'';ttlLbl.textContent=s.dataset.title||'';
+  counter.textContent=(n+1)+' / '+slides.length;progBar.style.width=(100*(n+1)/slides.length)+'%';
+  const id=s.dataset.id;if(location.hash.slice(1)!==id){try{history.replaceState(null,'','#'+id)}catch(e){try{location.hash=id}catch(_){}}}
+  const k=s.dataset.w;if(k&&W[k]&&W[k].enter)W[k].enter(s);
+  $$('#idxList li').forEach(li=>li.classList.toggle('cur',+li.dataset.i===n));
+}
+function next(){const s=slides[cur];if(!study){const h=steps(s).find(e=>!e.classList.contains('on'));if(h){h.classList.add('on');try{h.scrollIntoView({block:'nearest',behavior:RM?'auto':'smooth'})}catch(e){}return}}go(cur+1,'start')}
+function prev(){const s=slides[cur];if(!study){const on=steps(s).filter(e=>e.classList.contains('on'));if(on.length){on[on.length-1].classList.remove('on');return}}go(cur-1,'end')}
+const idxOf=id=>slides.findIndex(s=>s.dataset.id===id);
+
+/* índice */
+const idx=$('#idx');
+function buildIdx(){let h='',sec=null;slides.forEach((s,i)=>{const sc=s.dataset.sec||'Início';if(sc!==sec){if(sec!==null)h+='</ol>';h+='<h4>'+sc+'</h4><ol>';sec=sc}h+='<li data-i="'+i+'"><button data-i="'+i+'"><span>'+(i+1)+'</span>'+s.dataset.title+'</button></li>'});$('#idxList').innerHTML=h+'</ol>'}
+function openIdx(){idx.hidden=false;const c=$('#idxList li.cur button');if(c)c.focus()}
+function closeIdx(){idx.hidden=true}
+$('#idxList').addEventListener('click',e=>{const b=e.target.closest('button[data-i]');if(b){go(+b.dataset.i,'start');closeIdx()}});
+idx.addEventListener('click',e=>{if(e.target===idx)closeIdx()});
+$('#idxClose').addEventListener('click',closeIdx);
+
+/* toast e ecrã inteiro */
+let toastT=0;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2200)}
+function fullscreen(){const d=document,el=d.documentElement;try{if(d.fullscreenElement){d.exitFullscreen().catch(()=>{})}else if(el.requestFullscreen){el.requestFullscreen().catch(()=>toast('O ecrã inteiro não está disponível aqui.'))}else toast('O ecrã inteiro não está disponível aqui.')}catch(e){toast('O ecrã inteiro não está disponível aqui.')}}
+
+/* botões e teclado */
+$('#bPrev').addEventListener('click',prev);$('#bNext').addEventListener('click',next);
+$('#bIdx').addEventListener('click',()=>idx.hidden?openIdx():closeIdx());
+$('#bStudy').addEventListener('click',()=>{setStudy(!study);toast(study?'Modo estudo: todos os passos visíveis.':'Modo aula: os passos aparecem um a um.')});
+$('#bFs').addEventListener('click',fullscreen);
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&e.detail>0)b.blur();const g=e.target.closest('[data-go]');if(g){const i=idxOf(g.dataset.go);if(i>=0)go(i,'start')}});
+document.addEventListener('keydown',e=>{
+  if(e.altKey||e.ctrlKey||e.metaKey)return;
+  const k=e.key,tg=e.target;
+  if(tg.closest&&tg.closest('input,textarea,select')){if(k==='Escape')tg.blur();if(k!=='PageDown'&&k!=='PageUp')return}
+  if(!idx.hidden){if(k==='Escape'||k==='i'||k==='I'){closeIdx();e.preventDefault()}return}
+  const onBtn=tg.closest&&tg.closest('button');
+  if(k==='ArrowRight'||k==='PageDown'||(k===' '&&!e.shiftKey&&!onBtn)){e.preventDefault();next()}
+  else if(k==='ArrowLeft'||k==='PageUp'||(k===' '&&e.shiftKey&&!onBtn)){e.preventDefault();prev()}
+  else if(k==='Home'){e.preventDefault();go(0,'start')}else if(k==='End'){e.preventDefault();go(slides.length-1,'start')}
+  else if(k==='f'||k==='F'){fullscreen()}else if(k==='e'||k==='E'){$('#bStudy').click()}else if(k==='i'||k==='I'){openIdx()}
+});
+/* gestos */
+let tx=null,ty=null;
+stage.addEventListener('touchstart',e=>{const t=e.target;if(e.touches.length!==1||t.closest('input,button,canvas,.nosw,.seg,.opts')){tx=null;return}const mj=t.closest('mjx-container');if(mj&&mj.scrollWidth>mj.clientWidth+2){tx=null;return}tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+stage.addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;tx=null;if(Math.abs(dx)>60&&Math.abs(dx)>1.6*Math.abs(dy)){dx<0?next():prev()}},{passive:true});
+window.addEventListener('hashchange',()=>{const i=idxOf(location.hash.slice(1));if(i>=0)go(i,'start')});
+
+/* segmentos que alternam pilhas (genérico) */
+function bindSegs(){$$('.seg[data-stack]').forEach(seg=>{const name=seg.dataset.stack,slide=seg.closest('.slide'),bs=$$('button',seg);
+  const set=i=>{bs.forEach((b,j)=>b.setAttribute('aria-pressed',String(i===j)));$$('[data-stackof="'+name+'"]',slide).forEach(st=>Array.from(st.children).forEach((c,j)=>c.classList.toggle('on',i===j)));seg.dispatchEvent(new CustomEvent('segchange',{detail:i}))};
+  bs.forEach((b,i)=>b.addEventListener('click',()=>set(i)));set(0)})}
+
+/* passos dos exercícios aleatórios */
+function stepper(box,bN,bA){let k=0;
+  function upd(scroll){const xs=$$('.xstep',box);xs.forEach((x,i)=>{x.classList.toggle('on',i<k);x.classList.toggle('last',i===k-1&&!x.classList.contains('fin'))});const done=k>=xs.length;bN.disabled=done;bA.disabled=done;
+    if(scroll&&k>0){const l=xs[Math.min(k,xs.length)-1];try{l.scrollIntoView({block:'nearest',behavior:RM?'auto':'smooth'})}catch(e){}}}
+  bN.addEventListener('click',()=>{k++;upd(true)});bA.addEventListener('click',()=>{k=999;upd(true)});
+  return{set(html){k=0;const p=setTeX(box,html);upd(false);return p.then(()=>upd(false))}}}
+const XS=(k,body,fin)=>'<div class="xstep'+(fin?' fin':'')+'"><span class="xs-k">'+k+'</span>'+body+'</div>';
+
+/* ======================================================================
+   WIDGETS
+   ====================================================================== */
+
+/* 3 · pontos 1/(kπ) a acumular em 0 */
+W.acum={init(s){
+  const svg=$('svg.acum',s),rng=$('input',s),out=$('[data-out=w]',s),tx_=$('[data-out=txt]',s),btn=$('[data-act=play]',s);
+  S('line',{x1:10,y1:56,x2:590,y2:56,class:'ax'},svg);
+  [30,570].forEach(x=>S('line',{x1:x,y1:48,x2:x,y2:64,class:'ax'},svg));
+  const lL=T(svg,30,90,'','lbl',{'text-anchor':'middle'}),lR=T(svg,570,90,'','lbl',{'text-anchor':'middle'});
+  const g=S('g',{},svg),pool=[];for(let i=0;i<440;i++)pool.push(S('circle',{r:3,cy:56,cx:-50,class:'dot'},g));
+  S('circle',{cx:300,cy:56,r:6.5,class:'hole'},svg);T(svg,300,90,'0','m',{'text-anchor':'middle'});
+  let u=0,raf=0;
+  const wTxt=w=>w>=0.1?fx(w,2):w>=0.01?fx(w,3):fx(w,5);
+  function draw(){const w=0.5*Math.pow(10,-2.6*u),kmin=Math.max(1,Math.ceil(1/(Math.PI*w)));let i=0,k=kmin;
+    while(i<pool.length-1&&k<kmin*800){const x=1/(k*Math.PI),p=300+270*x/w;pool[i].setAttribute('cx',p.toFixed(2));pool[i+1].setAttribute('cx',(600-p).toFixed(2));i+=2;k=k<kmin+70?k+1:Math.ceil(k*1.05)}
+    for(;i<pool.length;i++)pool[i].setAttribute('cx',-50);
+    const ws=wTxt(w);lL.textContent='−'+ws;lR.textContent=ws;out.textContent='janela |z| < '+ws;
+    tx_.innerHTML='Nesta janela estão todos os <i>z<sub>k</sub></i> com |<i>k</i>| ≥ '+kmin.toLocaleString('pt-PT')+': são infinitos.'}
+  const stop=()=>{if(raf){cancelAnimationFrame(raf);raf=0}btn.textContent='▶ Zoom'};
+  rng.addEventListener('input',()=>{stop();u=rng.value/1000;draw()});
+  btn.addEventListener('click',()=>{if(raf){stop();return}if(u>=0.999)u=0;const u0=u,t0=performance.now();btn.textContent='❚❚ Pausa';
+    const f=now=>{u=Math.min(1,u0+(now-t0)/6000);rng.value=Math.round(u*1000);draw();if(u<1)raf=requestAnimationFrame(f);else stop()};raf=requestAnimationFrame(f)});
+  draw();this.stop=stop},
+  leave(){this.stop&&this.stop()}};
+
+/* 7 · coloração do domínio */
+W.dc={init(s){
+  const cv=$('canvas',s),ctx=cv.getContext('2d'),rng=$('input',s),win=$('[data-out=win]',s),seg=$('.seg',s),L2=Math.LN2;
+  const F=[
+    {f:(x,y)=>{const z=C(x,y),q=cdiv(csin(z),z);return[Math.log(cabs(q)),Math.atan2(q.im,q.re)]},c:[0,0],h:4.5},
+    {f:(x,y)=>[-Math.log(x*x+y*y),-2*Math.atan2(y,x)],c:[0,0],h:2},
+    {f:(x,y)=>{const w=csin(C(x,y));return[Math.log(cabs(w))-1.5*Math.log(x*x+y*y),Math.atan2(w.im,w.re)-3*Math.atan2(y,x)]},c:[0,0],h:2.5},
+    {f:(x,y)=>[-0.5*Math.log(x*x+y*y)-0.5*Math.log((x-1)*(x-1)+y*y),-Math.atan2(y,x)-Math.atan2(y,x-1)],c:[0.5,0],h:1.6},
+    {f:(x,y)=>{const d=x*x+y*y;return[x/d,-y/d]},c:[0,0],h:0.9}];
+  let fi=0,h=F[0].h,raf=0;const hmin=0.12,hmax=6,toU=v=>Math.log(v/hmin)/Math.log(hmax/hmin),toH=u=>hmin*Math.pow(hmax/hmin,u);
+  const hk=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<.5)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p};
+  function render(){raf=0;const N=cv.width,img=ctx.createImageData(N,N),d=img.data,fn=F[fi],cx=fn.c[0],cy=fn.c[1];
+    for(let j=0;j<N;j++){const y=cy+h-2*h*(j+.5)/N;for(let i=0;i<N;i++){const x=cx-h+2*h*(i+.5)/N,r=fn.f(x,y);
+      let hu=r[1]/(2*Math.PI);hu-=Math.floor(hu);if(!isFinite(hu))hu=0;const m=r[0]/L2;let fr=m-Math.floor(m);if(!isFinite(fr))fr=.5;
+      const l=.36+.26*fr,q=l<.5?l*1.9:l+.9-l*.9,p=2*l-q,o=4*(j*N+i);
+      d[o]=255*hk(p,q,hu+1/3);d[o+1]=255*hk(p,q,hu);d[o+2]=255*hk(p,q,hu-1/3);d[o+3]=255}}
+    ctx.putImageData(img,0,0);
+    const X0=(h-cx)/(2*h)*N,Y0=(cy+h)/(2*h)*N;ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,Y0);ctx.lineTo(N,Y0);ctx.moveTo(X0,0);ctx.lineTo(X0,N);ctx.stroke();
+    win.textContent='Re z ∈ ['+fx(cx-h,2)+'; '+fx(cx+h,2)+']'}
+  const req=()=>{if(!raf)raf=requestAnimationFrame(render)};
+  rng.addEventListener('input',()=>{h=toH(rng.value/1000);req()});
+  seg.addEventListener('segchange',e=>{fi=e.detail;h=F[fi].h;rng.value=Math.round(toU(h)*1000);req()});
+  rng.value=Math.round(toU(h)*1000);render()}};
+
+/* 9 · quiz de classificação */
+const QZ=[
+ [String.raw`\frac{\sen z}{z}`,'0','rem',String.raw`\(\displaystyle\lim_{z\to0}z\cdot\frac{\sen z}{z}=\lim_{z\to0}\sen z=0\). Pela série: \(\frac{\sen z}{z}=1-\frac{z^2}{6}+\cdots\), sem parte principal.`],
+ [String.raw`\frac{1-\cos z}{z^2}`,'0','rem',String.raw`\(\displaystyle\frac{1-\cos z}{z^2}=\frac{1}{z^2}\Big(\frac{z^2}{2}-\frac{z^4}{24}+\cdots\Big)=\frac12-\frac{z^2}{24}+\cdots\): não há potências negativas.`],
+ [String.raw`\frac{\sen z}{z^3}`,'0','p2',String.raw`\(\displaystyle\lim_{z\to0}z^2\frac{\sen z}{z^3}=\lim_{z\to0}\frac{\sen z}{z}=1\neq0\). Atenção: não é de ordem \(3\), porque \(\sen 0=0\).`],
+ [String.raw`\frac{\cos z}{z^3}`,'0','p3',String.raw`\(\displaystyle\lim_{z\to0}z^3\frac{\cos z}{z^3}=\cos 0=1\neq0\) (o numerador não se anula em \(0\)).`],
+ [String.raw`e^{1/z}`,'0','ess',String.raw`\(\displaystyle e^{1/z}=1+\frac1z+\frac{1}{2!\,z^2}+\frac{1}{3!\,z^3}+\cdots\): infinitas potências negativas.`],
+ [String.raw`z\,\sen\frac1z`,'0','ess',String.raw`\(\displaystyle z\sen\frac1z=z\Big(\frac1z-\frac{1}{3!\,z^3}+\cdots\Big)=1-\frac{1}{3!\,z^2}+\frac{1}{5!\,z^4}-\cdots\): infinitas potências negativas.`],
+ [String.raw`\frac{z^2-1}{z-1}`,'1','rem',String.raw`\(\frac{z^2-1}{z-1}=z+1\) para \(z\neq1\), logo \(\displaystyle\lim_{z\to1}(z-1)f(z)=0\).`],
+ [String.raw`\frac{e^z}{(z-1)^2}`,'1','p2',String.raw`\(\displaystyle\lim_{z\to1}(z-1)^2f(z)=\lim_{z\to1}e^z=e\neq0\).`],
+ [String.raw`\frac{1}{e^z-1}`,'0','p1',String.raw`\(e^z-1=z\big(1+\frac z2+\cdots\big)\), logo \(\displaystyle\lim_{z\to0}\frac{z}{e^z-1}=1\neq0\).`],
+ [String.raw`\frac{z}{(z^2+1)^2}`,'i','p2',String.raw`\(\displaystyle\lim_{z\to i}(z-i)^2f(z)=\lim_{z\to i}\frac{z}{(z+i)^2}=\frac{i}{(2i)^2}=-\frac i4\neq0\).`],
+ [String.raw`\frac{e^z-1}{z^2}`,'0','p1',String.raw`\(\displaystyle\lim_{z\to0}z\,\frac{e^z-1}{z^2}=\lim_{z\to0}\frac{e^z-1}{z}=1\neq0\).`],
+ [String.raw`\frac{1}{\sen z}`,'\\pi','p1',String.raw`Com \(w=z-\pi\), \(\sen z=-\sen w\), logo \(\displaystyle\lim_{z\to\pi}\frac{z-\pi}{\sen z}=\lim_{w\to0}\frac{w}{-\sen w}=-1\neq0\).`],
+ [String.raw`\cos\frac1z`,'0','ess',String.raw`\(\displaystyle\cos\frac1z=1-\frac{1}{2!\,z^2}+\frac{1}{4!\,z^4}-\cdots\): infinitas potências negativas.`],
+ [String.raw`\frac{\sen^2 z}{z^3}`,'0','p1',String.raw`\(\displaystyle\lim_{z\to0}z\,\frac{\sen^2z}{z^3}=\lim_{z\to0}\Big(\frac{\sen z}{z}\Big)^2=1\neq0\).`],
+ [String.raw`\frac{z}{\sen z}`,'0','rem',String.raw`\(\displaystyle\lim_{z\to0}z\cdot\frac{z}{\sen z}=0\cdot1=0\). (E \(f(z)\to1\).)`],
+ [String.raw`\frac{z-2i}{z^2+4}`,'2i','rem',String.raw`\(\frac{z-2i}{(z-2i)(z+2i)}=\frac{1}{z+2i}\) para \(z\neq2i\): limitada perto de \(2i\).`],
+ [String.raw`\frac{z^2}{(z-2i)^3}`,'2i','p3',String.raw`\(\displaystyle\lim_{z\to2i}(z-2i)^3f(z)=(2i)^2=-4\neq0\).`],
+ [String.raw`e^{\frac{1}{z-1}}`,'1','ess',String.raw`\(\displaystyle e^{\frac1{z-1}}=\sum_{n\ge0}\frac{1}{n!\,(z-1)^n}\): infinitas potências negativas de \(z-1\).`]];
+const OP=[['rem','Removível'],['p1','Polo simples'],['p2','Polo de ordem 2'],['p3','Polo de ordem 3'],['ess','Essencial']];
+const OPN={rem:'uma singularidade removível',p1:'um polo simples',p2:'um polo de ordem 2',p3:'um polo de ordem 3',ess:'uma singularidade essencial'};
+W.quiz={init(s){
+  const q=$('[data-out=q]',s),ops=$('[data-out=opts]',s),fb=$('[data-out=fb]',s),sc=$('[data-out=score]',s);
+  let order=[],pos=0,it=null,ok=0,tot=0,done=false;
+  const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=rnd(i+1);const t=a[i];a[i]=a[j];a[j]=t}return a};
+  const bs=OP.map(o=>{const b=document.createElement('button');b.textContent=o[1];b.dataset.k=o[0];b.addEventListener('click',()=>answer(o[0],b));ops.appendChild(b);return b});
+  function nextQ(){if(pos>=order.length){order=shuffle(QZ.map((_,i)=>i));pos=0}it=QZ[order[pos++]];done=false;bs.forEach(b=>{b.disabled=false;b.className=''});
+    setTeX(q,'\\[f(z)='+it[0]+'\\qquad\\text{em}\\quad a='+it[1]+'\\]');fb.innerHTML='<span class="muted small">Escolha uma opção.</span>'}
+  function answer(k,b){if(done)return;done=true;tot++;const right=k===it[2];if(right)ok++;
+    bs.forEach(x=>{x.disabled=true;if(x.dataset.k===it[2])x.classList.add('right')});if(!right)b.classList.add('wrong');
+    setTeX(fb,(right?'<span class="good">Certo!</span> ':'<span class="bad">Não.</span> É '+OPN[it[2]]+'. ')+it[3]);sc.textContent='acertos: '+ok+' / '+tot}
+  $('[data-act=new]',s).addEventListener('click',nextQ);nextQ();sc.textContent='acertos: 0 / 0'}};
+
+/* 10 · integral de (z-a)^n ao longo da circunferência */
+W.wind={init(s){
+  const L=$('svg.wl',s),R=$('svg.wr',s),seg=$('[data-out=nseg]',s),val=$('[data-out=val]',s),res=$('[data-out=res]',s),btn=$('[data-act=play]',s);
+  S('line',{x1:10,y1:100,x2:190,y2:100,class:'gl'},L);S('line',{x1:100,y1:10,x2:100,y2:190,class:'gl'},L);
+  S('circle',{cx:100,cy:100,r:70,class:'cur'},L);S('circle',{cx:100,cy:100,r:5,class:'pole'},L);T(L,108,96,'a','m');
+  const pt=S('circle',{r:7,class:'dot'},L);const ah=S('path',{d:AH,class:'ah'},L);T(L,8,192,'z = a + e','lbl').innerHTML='z = a + e<tspan dy="-6" font-size="10">is</tspan>';
+  const mx=x=>115+40*x,my=y=>238-30*y;
+  for(let k=-2;k<=2;k++)S('line',{x1:mx(k),y1:8,x2:mx(k),y2:276,class:'gl'},R);
+  for(let k=-1;k<=7;k++)S('line',{x1:6,y1:my(k),x2:224,y2:my(k),class:'gl'},R);
+  S('line',{x1:6,y1:my(0),x2:224,y2:my(0),class:'ax'},R);S('line',{x1:mx(0),y1:276,x2:mx(0),y2:6,class:'ax'},R);
+  S('line',{x1:6,y1:my(2*Math.PI),x2:224,y2:my(2*Math.PI),class:'ax dash',style:'stroke:var(--accent)'},R);T(R,mx(0)+6,my(2*Math.PI)-6,'2πi','m',{style:'fill:var(--accent)'});
+  T(R,10,272,'valor acumulado do integral','lbl');
+  const tr=S('polyline',{class:'cur2',points:''},R),tp=S('circle',{r:5,class:'pole'},R);
+  const I=(n,t)=>n===-1?C(0,t):C((Math.cos((n+1)*t)-1)/(n+1),Math.sin((n+1)*t)/(n+1));
+  let n=-1,t=0,raf=0;
+  const bs=[-3,-2,-1,0,1,2].map(k=>{const b=document.createElement('button');b.innerHTML='\\(n='+k+'\\)';b.addEventListener('click',()=>{n=k;bs.forEach(x=>x.setAttribute('aria-pressed',String(x===b)));play()});seg.appendChild(b);return b});
+  bs[2].setAttribute('aria-pressed','true');
+  function draw(){const x=100+70*Math.cos(t),y=100-70*Math.sin(t);pt.setAttribute('cx',x);pt.setAttribute('cy',y);arrowAt(ah,x,y,tanDeg(t,1));
+    const pts=[],M=Math.max(2,Math.ceil(t/0.02));for(let j=0;j<=M;j++){const v=I(n,t*j/M);pts.push(mx(v.re).toFixed(1)+','+my(v.im).toFixed(1))}
+    tr.setAttribute('points',pts.join(' '));const v=I(n,t);tp.setAttribute('cx',mx(v.re));tp.setAttribute('cy',my(v.im));val.textContent='s = '+fx(t,2)+'   ∫ ≈ '+fc(v.re,v.im,3)}
+  function finish(){setTeX(res,n===-1?'\\(\\displaystyle\\int_{|z-a|=1}\\frac{dz}{z-a}=2\\pi i\\). <span class="good">É a única potência que “sobrevive”.</span>':'\\(\\displaystyle\\int_{|z-a|=1}(z-a)^{'+n+'}\\,dz=0\\). <span class="muted">O valor acumulado volta a \\(0\\).</span>')}
+  function play(){cancelAnimationFrame(raf);res.innerHTML='';const t0=performance.now(),D=RM?1:3600;const f=now=>{t=Math.min(1,(now-t0)/D)*2*Math.PI;draw();if(t<2*Math.PI)raf=requestAnimationFrame(f);else{raf=0;finish()}};raf=requestAnimationFrame(f)}
+  btn.addEventListener('click',play);t=2*Math.PI;draw();finish();this.stop=()=>cancelAnimationFrame(raf)},
+  leave(){this.stop&&this.stop()}};
+
+/* 12 · teorema dos resíduos com circunferência arrastável */
+W.rt={init(s){
+  const svg=$('svg.rt-svg',s),rr=$('[data-in=r]',s),rOut=$('[data-out=r]',s),kseg=$('[data-out=kseg]',s),tot=$('[data-out=tot]',s),num=$('[data-out=num]',s),warn=$('[data-out=warn]',s);
+  rr.step=5;const U=60,px=x=>210+U*x,py=y=>200-U*y;
+  for(let k=-3;k<=3;k++)S('line',{x1:px(k),y1:0,x2:px(k),y2:300,class:'gl'},svg);
+  for(let k=-1;k<=3;k++)S('line',{x1:0,y1:py(k),x2:420,y2:py(k),class:'gl'},svg);
+  S('line',{x1:0,y1:py(0),x2:420,y2:py(0),class:'ax'},svg);S('line',{x1:px(0),y1:0,x2:px(0),y2:300,class:'ax'},svg);
+  const PN=[C(0,0),C(1,0),C(0,2)],PL=['0','1','2i'],RES=[G(0,Q(-1,2)),G(Q(1,5),Q(2,5)),G(Q(-1,5),Q(1,10))];
+  const c1=S('circle',{class:'cur'},svg),c2=S('circle',{class:'cur',style:'opacity:.4'},svg);
+  const ars=[0,1,2].map(()=>S('path',{d:AH,class:'ah'},svg));
+  PN.forEach((p,i)=>{S('circle',{cx:px(p.re),cy:py(p.im),r:6.5,class:'pole'},svg);T(svg,px(p.re)+9,py(p.im)-9,PL[i],'m')});
+  const hd=S('circle',{r:7.5,class:'dot'},svg);
+  let c=C(0,0),r=1.5,k=1,key='',raf=0;
+  const KS=[[1,'1 volta ↺'],[2,'2 voltas ↺'],[-1,'1 volta ↻'],[-2,'2 voltas ↻']];
+  const kb=KS.map(o=>{const b=document.createElement('button');b.textContent=o[1];b.addEventListener('click',()=>{k=o[0];kb.forEach(x=>x.setAttribute('aria-pressed',String(x===b)));req()});kseg.appendChild(b);return b});
+  kb[0].setAttribute('aria-pressed','true');
+  const f=z=>cdiv(C(1,0),cmul(cmul(z,csub(z,C(1,0))),csub(z,C(0,2))));
+  function update(){raf=0;
+    c1.setAttribute('cx',px(c.re));c1.setAttribute('cy',py(c.im));c1.setAttribute('r',U*r);
+    c2.setAttribute('cx',px(c.re));c2.setAttribute('cy',py(c.im));c2.setAttribute('r',U*r+5);c2.style.display=Math.abs(k)===2?'':'none';
+    hd.setAttribute('cx',px(c.re));hd.setAttribute('cy',py(c.im));
+    ars.forEach((a,j)=>{const th=j*2*Math.PI/3+.6;arrowAt(a,px(c.re)+U*r*Math.cos(th),py(c.im)-U*r*Math.sin(th),tanDeg(th,k))});
+    rOut.textContent='raio '+fx(r,2)+' · centro '+fc(c.re,c.im,1);
+    let near=false;const inds=PN.map((p,i)=>{const d=cabs(csub(p,c)),nr=Math.abs(d-r)<0.06;if(nr)near=true;const v=d<r?k:0;const td=$('[data-ind="'+i+'"]',s);td.textContent=nr?'—':String(v).replace('-','−');td.parentElement.classList.toggle('hl',v!==0&&!nr);return v});
+    if(near){warn.textContent='O caminho passa (quase) por um polo: o teorema exige que γ esteja em Ω∖{a₁, …, aₙ}.';num.textContent='';tot.style.opacity=.3;key='';return}
+    warn.textContent='';tot.style.opacity=1;
+    const kk=inds.join(',');if(kk!==key){key=kk;let Sm=G(0);const terms=[];
+      inds.forEach((v,i)=>{if(v){Sm=gadd(Sm,gscale(RES[i],v));const t=cT(RES[i]);terms.push(v===1?t:v===-1?'-'+par(t):v+'\\cdot'+par(t))}});
+      const inner=terms.length?clean(terms.join('+')):'0';
+      setTeX(tot,'\\[\\int_\\gamma f=2\\pi i\\left('+inner+'\\right)='+piT(gmul(G(0,2),Sm))+'\\]')}
+    const v=cint(f,t=>C(c.re+r*Math.cos(k*t),c.im+r*Math.sin(k*t)),t=>C(-r*k*Math.sin(k*t),r*k*Math.cos(k*t)),0,2*Math.PI,1400*Math.abs(k));
+    num.textContent='Verificação numérica: ∫ ≈ '+fc(v.re,v.im,4)+'  (π ≈ 3,1416)'}
+  const req=()=>{if(!raf)raf=requestAnimationFrame(update)};
+  rr.addEventListener('input',()=>{r=rr.value/100;req()});
+  let drag=false;
+  function move(e){const m=svg.getScreenCTM();if(!m)return;const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform(m.inverse());
+    c=C(clamp(Math.round((q.x-210)/U*10)/10,-3.4,3.4),clamp(Math.round((200-q.y)/U*10)/10,-1.6,3.2));req()}
+  svg.addEventListener('pointerdown',e=>{drag=true;try{svg.setPointerCapture(e.pointerId)}catch(_){}svg.style.cursor='grabbing';move(e)});
+  svg.addEventListener('pointermove',e=>{if(drag)move(e)});
+  const end=()=>{drag=false;svg.style.cursor='grab'};svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);
+  r=rr.value/100;update()}};
+
+/* figura genérica: circunferência e polos */
+function drawCircFig(svg,poles,z0,r,k){
+  svg.innerHTML='';const xs=poles.map(p=>p.z.re).concat([z0.re-r,z0.re+r,0]),ys=poles.map(p=>p.z.im).concat([z0.im-r,z0.im+r,0]);
+  const x0=Math.min.apply(null,xs)-.8,x1=Math.max.apply(null,xs)+.8,y0=Math.min.apply(null,ys)-.8,y1=Math.max.apply(null,ys)+.8;
+  const span=Math.max(x1-x0,y1-y0),cx=(x0+x1)/2,cy=(y0+y1)/2,sc=290/span,X=x=>150+sc*(x-cx),Y=y=>150-sc*(y-cy);
+  for(let i=Math.ceil(cx-span/2);i<=Math.floor(cx+span/2);i++)S('line',{x1:X(i),y1:0,x2:X(i),y2:300,class:'gl'},svg);
+  for(let i=Math.ceil(cy-span/2);i<=Math.floor(cy+span/2);i++)S('line',{x1:0,y1:Y(i),x2:300,y2:Y(i),class:'gl'},svg);
+  S('line',{x1:0,y1:Y(0),x2:300,y2:Y(0),class:'ax'},svg);S('line',{x1:X(0),y1:0,x2:X(0),y2:300,class:'ax'},svg);
+  S('circle',{cx:X(z0.re),cy:Y(z0.im),r:sc*r,class:'cur'},svg);
+  if(Math.abs(k)>1)S('circle',{cx:X(z0.re),cy:Y(z0.im),r:sc*r+5,class:'cur',style:'opacity:.4'},svg);
+  [0,1,2].forEach(j=>{const th=j*2*Math.PI/3+.4;arrowAt(S('path',{d:AH,class:'ah'},svg),X(z0.re)+sc*r*Math.cos(th),Y(z0.im)-sc*r*Math.sin(th),tanDeg(th,k))});
+  S('circle',{cx:X(z0.re),cy:Y(z0.im),r:3,class:'dot'},svg);
+  poles.forEach(p=>{S('circle',{cx:X(p.z.re),cy:Y(p.z.im),r:6.5,class:'pole'},svg);T(svg,X(p.z.re)+9,Y(p.z.im)-9,p.l,'m')});
+  if(Math.abs(k)>1)T(svg,8,18,Math.abs(k)+' voltas','lbl',{style:'fill:var(--teal)'});
+}
+
+/* 13 · exercício aleatório: integral num caminho fechado */
+const GP=[[0,0],[1,0],[-1,0],[2,0],[-2,0],[0,1],[0,-1],[0,2],[0,-2]],CPL=[[0,0],[1,0],[-1,0],[2,0],[0,1],[0,-1],[0,2]],Z0=[[0,0],[0,0],[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]];
+function genExo(){for(let t=0;t<5000;t++){const A=pick(GP),B=pick(GP);if(A===B)continue;
+  const m=Math.random()<.6?2:1,lin=Math.random()<.65,cc=lin?pick(CPL):null;
+  if(lin&&((A[0]+cc[0]===0&&A[1]+cc[1]===0)||(B[0]+cc[0]===0&&B[1]+cc[1]===0)))continue;
+  const z0=pick(Z0),r=pick([1,2,2,3]),k=pick([1,1,1,-1,-1,2,-2,3]);
+  const d2=P=>(P[0]-z0[0])*(P[0]-z0[0])+(P[1]-z0[1])*(P[1]-z0[1]),da=d2(A),db=d2(B);
+  if(Math.abs(Math.sqrt(da)-r)<.3||Math.abs(Math.sqrt(db)-r)<.3)continue;
+  const ia=da<r*r,ib=db<r*r;if(!ia&&!ib)continue;if(ia&&ib&&Math.random()<.4)continue;
+  return{A:A,B:B,m:m,lin:lin,cc:cc,z0:z0,r:r,k:k,da:da,db:db,ia:ia,ib:ib}}}
+W.exo={init(s){
+  const en=$('[data-out=enun]',s),fig=$('[data-out=fig]',s),st=$('[data-out=steps]',s);
+  const ctl=stepper(st,$('[data-act=next]',s),$('[data-act=all]',s));
+  function build(){const e=genExo(),a=G(e.A[0],e.A[1]),b=G(e.B[0],e.B[1]),c=e.lin?G(e.cc[0],e.cc[1]):null,one=G(1),m=e.m;
+    const Na=e.lin?gadd(a,c):one,Nb=e.lin?gadd(b,c):one,amb=gsub(a,b),bma=gsub(b,a);
+    const resB=gdiv(Nb,m===1?bma:gmul(bma,bma)),Gt=e.lin?gneg(gadd(b,c)):G(-1),resA=m===1?gdiv(Na,amb):gdiv(Gt,gmul(amb,amb));
+    const Ia=e.ia?e.k:0,Ib=e.ib?e.k:0,Sm=gadd(gscale(resA,Ia),gscale(resB,Ib)),Wr=gmul(G(0,2),Sm);
+    const aT=cT(a),bT=cT(b),numT=e.lin?(gzero(c)?'z':'z'+(cT(c)[0]==='-'?cT(c):'+'+cT(c))):'1';
+    const denT=gzero(b)?'z'+zpow(a,m):zpow(a,m)+zpow(b,1),fT='\\frac{'+numT+'}{'+denT+'}';
+    const z0=G(e.z0[0],e.z0[1]),z0T=cT(z0),ex=e.k===1?'it':e.k===-1?'-it':e.k+'it',gamT=(gzero(z0)?'':z0T+'+')+(e.r===1?'':e.r)+'e^{'+ex+'}';
+    setTeX(en,'<p style="margin-top:0">Calcule</p>\\[\\int_\\gamma'+fT+'\\,dz,\\]<p>onde \\(\\gamma(t)='+gamT+'\\), \\(t\\in[0,2\\pi]\\).</p>');
+    drawCircFig(fig,[{z:gnum(a),l:txt(a)},{z:gnum(b),l:txt(b)}],gnum(z0),e.r,e.k);
+    const ord=m===1?'um polo simples':'um polo de ordem \\(2\\)';
+    const h=[];
+    h.push(XS('Passo 1 · Singularidades','Os zeros do denominador são \\(z='+aT+'\\) e \\(z='+bT+'\\)'+(e.lin?', e o numerador \\('+numT+'\\) não se anula em nenhum deles':'')+'. São singularidades isoladas de \\(f\\).'));
+    const limA='\\lim_{z\\to '+aT+'}'+zpow(a,m)+'f(z)=\\lim_{z\\to '+aT+'}\\frac{'+numT+'}{'+zm(b)+'}=\\frac{'+cT(Na)+'}{'+cT(amb)+'}='+cT(gdiv(Na,amb))+'\\neq0';
+    const limB='\\lim_{z\\to '+bT+'}'+zpow(b,1)+'f(z)=\\lim_{z\\to '+bT+'}\\frac{'+numT+'}{'+zden(a,m)+'}=\\frac{'+cT(Nb)+'}{'+(m===1?cT(bma):parPow(cT(bma))+'^{2}')+'}='+cT(resB)+'\\neq0';
+    h.push(XS('Passo 2 · Classificação (critério dos limites)','\\['+limA+'\\]\\['+limB+'\\]Logo \\('+aT+'\\) é '+ord+' e \\('+bT+'\\) é um polo simples.'));
+    let r3;
+    if(m===1)r3='São polos simples, logo os resíduos são os limites anteriores:\\[\\Res(f,'+aT+')='+cT(resA)+',\\qquad\\Res(f,'+bT+')='+cT(resB)+'.\\]';
+    else{const d1=e.lin?'\\frac{'+pz(zm(b))+'-'+pz(numT)+'}{'+zpow(b,2)+'}':'\\frac{-1}{'+zpow(b,2)+'}';
+      const d2=e.lin?'=\\lim_{z\\to '+aT+'}\\frac{'+cT(Gt)+'}{'+zpow(b,2)+'}':'';
+      r3='\\(\\Res(f,'+bT+')='+cT(resB)+'\\) (polo simples: é o limite anterior). Para o polo de ordem \\(2\\), \\(\\Res(f,a)=\\lim_{z\\to a}\\big((z-a)^2f(z)\\big)\'\\):'+
+        '\\[\\Res(f,'+aT+')=\\lim_{z\\to '+aT+'}\\Big(\\frac{'+numT+'}{'+zm(b)+'}\\Big)\'=\\lim_{z\\to '+aT+'}'+d1+d2+'=\\frac{'+cT(Gt)+'}{'+parPow(cT(amb))+'^{2}}='+cT(resA)+'\\]'}
+    h.push(XS('Passo 3 · Resíduos',r3));
+    const dist=(P,d2,inside,I,pT)=>{const w=gsub(P,z0);return'<li>\\('+(gzero(z0)?'|'+pT+'|':'|'+pT+'-'+parSub(z0T)+'|=|'+cT(w)+'|')+'='+sqrtT(d2)+(inside?'\\lt ':'\\gt ')+e.r+'\\), logo \\(\\Ind_\\gamma('+pT+')='+I+'\\).</li>'};
+    const voltas=Math.abs(e.k)===1?'uma vez':Math.abs(e.k)+' vezes';
+    h.push(XS('Passo 4 · Índices','\\(\\gamma\\) é a circunferência de centro \\('+z0T+'\\) e raio \\('+e.r+'\\), percorrida '+voltas+' no sentido '+(e.k>0?'positivo':'negativo')+'. Dentro, \\(\\Ind_\\gamma='+e.k+'\\); fora, \\(\\Ind_\\gamma=0\\).<ul>'+dist(a,e.da,e.ia,Ia,aT)+dist(b,e.db,e.ib,Ib,bT)+'</ul>'));
+    const fz=z=>{const N=e.lin?cadd(z,gnum(c)):C(1,0);return cdiv(N,cmul(cpow(csub(z,gnum(a)),m),csub(z,gnum(b))))};
+    const zz=gnum(z0),v=cint(fz,t=>C(zz.re+e.r*Math.cos(e.k*t),zz.im+e.r*Math.sin(e.k*t)),t=>C(-e.r*e.k*Math.sin(e.k*t),e.r*e.k*Math.cos(e.k*t)),0,2*Math.PI,2400*Math.abs(e.k));
+    const w=gnum(Wr);
+    h.push(XS('Passo 5 · Teorema dos resíduos',clean('\\[\\int_\\gamma f=2\\pi i\\Big('+Ia+'\\cdot'+par(cT(resA))+'+'+Ib+'\\cdot'+par(cT(resB))+'\\Big)=2\\pi i\\cdot'+par(cT(Sm))+'='+piT(Wr)+'\\]')+
+      '<div class="check">Verificação numérica: ∫ ≈ '+fc(v.re,v.im,4)+' · resultado exato ≈ '+fc(Math.PI*w.re,Math.PI*w.im,4)+'</div>',true));
+    ctl.set(h.join(''))}
+  $('[data-act=new]',s).addEventListener('click',build);build()}};
+
+/* 15 · semicircunferência a crescer */
+W.semi={init(s){
+  const svg=$('svg.semi-svg',s),rng=$('input',s),btn=$('[data-act=play]',s),o=k=>$('[data-out='+k+']',s),sp=$('svg.spark',s);
+  const f=z=>{const z2=cmul(z,z);return cdiv(C(z.re+1,z.im),cmul(C(z2.re+1,z2.im),C(z2.re+4,z2.im)))};
+  const fr=x=>(x+1)/((x*x+1)*(x*x+4));
+  const arc=(R,N)=>cint(f,t=>C(R*Math.cos(t),R*Math.sin(t)),t=>C(-R*Math.sin(t),R*Math.cos(t)),0,Math.PI,N||1600);
+  const Rof=u=>0.5*Math.pow(80,u),OX=200,OY=200;
+  S('rect',{x:0,y:0,width:400,height:OY,class:'areaA',style:'opacity:.6'},svg);
+  S('line',{x1:0,y1:OY,x2:400,y2:OY,class:'ax'},svg);S('line',{x1:OX,y1:230,x2:OX,y2:0,class:'ax'},svg);
+  const path=S('path',{class:'cur'},svg),a1=S('path',{d:AH,class:'ah'},svg),a2=S('path',{d:AH,class:'ah'},svg);
+  const p1=S('circle',{r:6.5,class:'pole'},svg),p2=S('circle',{r:6.5,class:'pole'},svg),l1=T(svg,0,0,'i','m'),l2=T(svg,0,0,'2i','m'),lR=T(svg,0,0,'R','m'),lm=T(svg,0,0,'−R','m');
+  const R0=Math.log(2.05),R1=Math.log(40),SX=R=>24+366*(Math.log(R)-R0)/(R1-R0),data=[];
+  for(let j=0;j<=90;j++){const R=Math.exp(R0+(R1-R0)*j/90);data.push([R,cabs(arc(R,1200))])}
+  const mxv=data[0][1],SY=v=>104-88*v/mxv;
+  S('line',{x1:24,y1:104,x2:392,y2:104,class:'ax'},sp);S('line',{x1:24,y1:104,x2:24,y2:10,class:'ax'},sp);
+  S('polyline',{class:'cur2',points:data.map(d=>SX(d[0]).toFixed(1)+','+SY(d[1]).toFixed(1)).join(' ')},sp);
+  T(sp,24,118,'R = 2','lbl');T(sp,392,118,'R = 40','lbl',{'text-anchor':'end'});T(sp,30,18,'|∫ em C_R|','lbl');
+  const mk=S('circle',{r:5,class:'dot'},sp);
+  let u=rng.value/1000,raf=0;
+  function draw(){const R=Rof(u),sc=150/Math.max(R,2.5),rp=sc*R;
+    path.setAttribute('d','M'+(OX-rp)+' '+OY+' L'+(OX+rp)+' '+OY+' A'+rp+' '+rp+' 0 0 0 '+(OX-rp)+' '+OY);
+    arrowAt(a1,OX+rp*.55,OY,0);const th=.72*Math.PI;arrowAt(a2,OX+rp*Math.cos(th),OY-rp*Math.sin(th),tanDeg(th,1));
+    p1.setAttribute('cx',OX);p1.setAttribute('cy',OY-sc);p2.setAttribute('cx',OX);p2.setAttribute('cy',OY-2*sc);
+    p1.setAttribute('class',R>1?'pole':'pole out');p2.setAttribute('class',R>2?'pole':'pole out');
+    l1.setAttribute('x',OX+9);l1.setAttribute('y',OY-sc+4);l2.setAttribute('x',OX+9);l2.setAttribute('y',OY-2*sc+4);
+    lR.setAttribute('x',OX+rp-6);lR.setAttribute('y',OY+20);lm.setAttribute('x',OX-rp-12);lm.setAttribute('y',OY+20);
+    o('R').textContent='R = '+fx(R,2);
+    if(R>2.05){mk.style.display='';mk.setAttribute('cx',SX(Math.min(R,40)));mk.setAttribute('cy',SY(cabs(arc(R,800))))}else mk.style.display='none';
+    if(Math.abs(R-1)<.03||Math.abs(R-2)<.03){o('warn').textContent='O caminho passa (quase) por um polo: os integrais deixam de fazer sentido.';['seg','arc','sum','res'].forEach(k=>o(k).textContent='—');o('inside').textContent='';draw.k=-2;return}
+    o('warn').textContent='';const N=(Math.abs(R-1)<.2||Math.abs(R-2)<.2)?5000:1600;
+    const A=arc(R,N),sI=rint(fr,-R,R,N),res=R<1?C(0,0):R<2?C(Math.PI/3,Math.PI/3):C(Math.PI/6,0);
+    o('seg').textContent=fx(sI);o('arc').textContent=fc(A.re,A.im);o('sum').textContent=fc(sI+A.re,A.im);o('res').textContent=fc(res.re,res.im);
+    const key=R<1?0:R<2?1:2;if(key!==draw.k){draw.k=key;setTeX(o('inside'),key===0?'Nenhum polo dentro do caminho: a soma é \\(0\\) (teorema de Cauchy).':key===1?'Dentro está só \\(i\\): \\(2\\pi i\\Res(f,i)=\\frac{\\pi(1+i)}{3}\\). Ainda falta \\(2i\\).':'Dentro estão \\(i\\) e \\(2i\\): a soma fica \\(\\frac\\pi6\\) para sempre, e o arco vai desaparecendo.')}}
+  const stop=()=>{if(raf){cancelAnimationFrame(raf);raf=0}btn.textContent='▶ Aumentar R'};
+  rng.addEventListener('input',()=>{stop();u=rng.value/1000;draw.k=-1;draw()});
+  btn.addEventListener('click',()=>{if(raf){stop();return}if(u>=.999)u=0;const u0=u,t0=performance.now();btn.textContent='❚❚ Pausa';
+    const fn=now=>{u=Math.min(1,u0+(now-t0)/10000);rng.value=Math.round(u*1000);draw();if(u<1)raf=requestAnimationFrame(fn);else stop()};raf=requestAnimationFrame(fn)});
+  draw.k=-1;draw();this.stop=stop},
+  leave(){this.stop&&this.stop()}};
+
+/* 20 · raízes de z^4 = -1 */
+W.roots={init(s){
+  const svg=$('svg',s),btn=$('[data-act=play]',s),O=150,Rr=100;
+  S('rect',{x:0,y:0,width:300,height:O,class:'areaA'},svg);
+  S('line',{x1:0,y1:O,x2:300,y2:O,class:'ax'},svg);S('line',{x1:O,y1:300,x2:O,y2:0,class:'ax'},svg);
+  S('circle',{cx:O,cy:O,r:Rr,class:'ax dash'},svg);T(svg,10,20,'semiplano superior','lbl');T(svg,O+Rr+4,O+18,'1','m');
+  const ray=S('line',{x1:O,y1:O,x2:O+Rr,y2:O,class:'cur'},svg);
+  const lab=['π/4','3π/4','5π/4','7π/4'];
+  const pts=[0,1,2,3].map(k=>{const th=Math.PI/4+k*Math.PI/2,x=O+Rr*Math.cos(th),y=O-Rr*Math.sin(th),g=S('g',{style:'transition:opacity .35s'},svg);
+    S('circle',{cx:x,cy:y,r:7,class:k<2?'pole':'pole out'},g);const t=T(g,x+(Math.cos(th)>0?10:-66),y+(Math.sin(th)>0?-10:22),'','m');
+    t.innerHTML='e<tspan dy="-7" font-size="11">i'+lab[k]+'</tspan>';return{g:g,th:th}});
+  let raf=0;
+  function play(){cancelAnimationFrame(raf);if(RM){pts.forEach(p=>p.g.style.opacity=1);return}pts.forEach(p=>p.g.style.opacity=0);const t0=performance.now();
+    const f=now=>{const a=Math.min(1,(now-t0)/3200)*2*Math.PI;ray.setAttribute('x2',O+Rr*Math.cos(a));ray.setAttribute('y2',O-Rr*Math.sin(a));pts.forEach(p=>{if(a>=p.th)p.g.style.opacity=1});if(a<2*Math.PI)raf=requestAnimationFrame(f);else raf=0};raf=requestAnimationFrame(f)}
+  btn.addEventListener('click',play);this.play=play},
+  enter(){this.play&&this.play()}};
+
+/* 21 · exercício aleatório: integral impróprio */
+function genA(){for(;;){const ab=pick([[1,2],[1,3],[2,3],[1,2]]),a=ab[0],b=ab[1],s=Math.random()<.35?1:0,p=pick([0,0,1,-1,2]),q=pick(s?[0,1,2,3,4,5]:[1,2,3,4,5,6]);
+  if(!s&&!p&&!q)continue;if(!p&&(q===s*a*a||q===s*b*b))continue;if(q+s*a*b<=0)continue;return{fam:'A',a:a,b:b,s:s,p:p,q:q}}}
+function genB(){for(;;){const a=pick([1,1,2,3]),s=Math.random()<.3?1:0,p=pick([0,0,1,-1,2]),q=pick(s?[0,1,2,3]:[1,2,3,4,5]);
+  if(!s&&!p&&!q)continue;if(!p&&q===s*a*a)continue;if(s*a*a+q<=0)continue;return{fam:'B',a:a,s:s,p:p,q:q}}}
+function genC(){return{fam:'C',a:pick([1,2]),P:pick(['1','x2'])}}
+W.exi={init(s){
+  const en=$('[data-out=enun]',s),fig=$('[data-out=fig]',s),st=$('[data-out=steps]',s),famSeg=$('[data-out=fam]',s);
+  const ctl=stepper(st,$('[data-act=next]',s),$('[data-act=all]',s));
+  let fam='*';
+  const FB=[['*','Aleatório'],['A','\\((x^2+a^2)(x^2+b^2)\\)'],['B','\\((x^2+a^2)^2\\)'],['C','\\(x^4+a^4\\)']];
+  const fbs=FB.map(o=>{const b=document.createElement('button');b.innerHTML=o[1];b.addEventListener('click',()=>{fam=o[0];fbs.forEach(x=>x.setAttribute('aria-pressed',String(x===b)));build()});famSeg.appendChild(b);return b});
+  fbs[0].setAttribute('aria-pressed','true');
+  const iT=a=>a===1?'i':a+'i';
+  function figure(up,down,R){fig.innerHTML='';const O=150,OY=160,sc=130/R;
+    S('rect',{x:0,y:0,width:300,height:OY,class:'areaA',style:'opacity:.6'},fig);
+    S('line',{x1:0,y1:OY,x2:300,y2:OY,class:'ax'},fig);S('line',{x1:O,y1:240,x2:O,y2:0,class:'ax'},fig);
+    S('path',{d:'M'+(O-130)+' '+OY+' L'+(O+130)+' '+OY+' A130 130 0 0 0 '+(O-130)+' '+OY,class:'cur'},fig);
+    arrowAt(S('path',{d:AH,class:'ah'},fig),O+70,OY,0);arrowAt(S('path',{d:AH,class:'ah'},fig),O+130*Math.cos(2.3),OY-130*Math.sin(2.3),tanDeg(2.3,1));
+    up.forEach(p=>{S('circle',{cx:O+sc*p.z.re,cy:OY-sc*p.z.im,r:6.5,class:'pole'},fig);T(fig,O+sc*p.z.re+9,OY-sc*p.z.im-6,p.l,'m')});
+    down.forEach(p=>{S('circle',{cx:O+sc*p.z.re,cy:OY-sc*p.z.im,r:5.5,class:'pole out'},fig)});
+    T(fig,O+128,OY+18,'R','m');}
+  function build(){const F=fam==='*'?pick(['A','A','A','B','B','C']):fam,e=F==='A'?genA():F==='B'?genB():genC();
+    const even=e.fam==='C'||e.p===0,dom=even?pick(['R','R','pos','neg']):'R';
+    const lim={R:['-\\infty','+\\infty'],pos:['0','+\\infty'],neg:['-\\infty','0']}[dom],intT='\\int_{'+lim[0]+'}^{'+lim[1]+'}';
+    const h=[];let PxT,QxT,fxr,Wv,PzT;
+    if(e.fam==='A'){const a=e.a,b=e.b,s_=e.s,p=e.p,q=e.q;PxT=polyT(s_,p,q,'x');PzT=polyT(s_,p,q,'z');QxT='(x^2+'+a*a+')(x^2+'+b*b+')';
+      fxr=x=>(s_*x*x+p*x+q)/((x*x+a*a)*(x*x+b*b));
+      const Pai=G(q-s_*a*a,p*a),Pbi=G(q-s_*b*b,p*b),r1=gdiv(Pai,G(0,2*a*(b*b-a*a))),r2=gdiv(Pbi,G(0,2*b*(a*a-b*b))),Sm=gadd(r1,r2);Wv=gmul(G(0,2),Sm);
+      const dP=s_?2:p?1:0;
+      h.push(XS('Passo 1 · Condições','\\(P(x)='+PxT+'\\) tem grau \\('+dP+'\\) e \\(Q(x)='+QxT+'\\) tem grau \\(4\\ge'+dP+'+2\\), sem zeros reais. Seja \\(f(z)=\\frac{'+PzT+'}{(z^2+'+a*a+')(z^2+'+b*b+')}\\) e \\(\\gamma_R=[-R,R]+C_R\\), com \\(R\\gt'+b+'\\).'));
+      h.push(XS('Passo 2 · Singularidades','\\(z^2+'+a*a+'=0\\iff z=\\pm '+iT(a)+'\\) e \\(z^2+'+b*b+'=0\\iff z=\\pm '+iT(b)+'\\). No semiplano superior estão \\('+iT(a)+'\\) e \\('+iT(b)+'\\).'));
+      h.push(XS('Passo 3 · Classificação e resíduos','Os limites seguintes são finitos e não nulos, logo \\('+iT(a)+'\\) e \\('+iT(b)+'\\) são polos simples e estes limites são os resíduos:'+
+        '\\[\\Res(f,'+iT(a)+')=\\lim_{z\\to '+iT(a)+'}\\frac{'+PzT+'}{(z+'+iT(a)+')(z^2+'+b*b+')}=\\frac{'+cT(Pai)+'}{'+cT(G(0,2*a))+'\\cdot'+(b*b-a*a)+'}='+cT(r1)+'\\]'+
+        '\\[\\Res(f,'+iT(b)+')=\\lim_{z\\to '+iT(b)+'}\\frac{'+PzT+'}{(z^2+'+a*a+')(z+'+iT(b)+')}=\\frac{'+cT(Pbi)+'}{('+(a*a-b*b)+')\\cdot'+cT(G(0,2*b))+'}='+cT(r2)+'\\]'));
+      h.push(XS('Passo 4 · O arco desaparece','\\[\\Big|\\int_{C_R}f\\Big|\\le\\pi R\\cdot\\frac{'+polyT(s_,Math.abs(p),q,'R')+'}{(R^2-'+a*a+')(R^2-'+b*b+')}\\xrightarrow[R\\to+\\infty]{}0\\]'));
+      h.push(XS('Passo 5 · Resultado',clean('\\[\\int_{-\\infty}^{+\\infty}f(x)\\,dx=2\\pi i\\Big('+cT(r1)+'+'+cT(r2)+'\\Big)=2\\pi i\\cdot'+par(cT(Sm))+'='+piT(Wv)+'\\]'),dom==='R'))}
+    else if(e.fam==='B'){const a=e.a,s_=e.s,p=e.p,q=e.q;PxT=polyT(s_,p,q,'x');PzT=polyT(s_,p,q,'z');QxT='(x^2+'+a*a+')^2';
+      fxr=x=>(s_*x*x+p*x+q)/((x*x+a*a)*(x*x+a*a));
+      const Pai=G(q-s_*a*a,p*a),dPai=G(p,2*s_*a),tai=G(0,2*a),nm=gsub(gmul(dPai,tai),gscale(Pai,2)),dn=gmul(gmul(tai,tai),tai),res=gdiv(nm,dn),l2=gdiv(Pai,gmul(tai,tai));Wv=gmul(G(0,2),res);
+      const dP=s_?2:p?1:0,ai=iT(a);
+      h.push(XS('Passo 1 · Condições','\\(P(x)='+PxT+'\\) tem grau \\('+dP+'\\) e \\(Q(x)='+QxT+'\\) tem grau \\(4\\ge'+dP+'+2\\), sem zeros reais. Seja \\(f(z)=\\frac{'+PzT+'}{(z^2+'+a*a+')^2}=\\frac{'+PzT+'}{(z-'+ai+')^2(z+'+ai+')^2}\\).'));
+      h.push(XS('Passo 2 · Singularidades e classificação','\\(z^2+'+a*a+'=0\\iff z=\\pm '+ai+'\\) (raízes duplas de \\(Q\\)). No semiplano superior só está \\('+ai+'\\):\\[\\lim_{z\\to '+ai+'}(z-'+ai+')^2f(z)=\\lim_{z\\to '+ai+'}\\frac{'+PzT+'}{(z+'+ai+')^2}=\\frac{'+cT(Pai)+'}{'+parPow(cT(tai))+'^2}='+cT(l2)+'\\neq0,\\]logo é um polo de ordem \\(2\\).'));
+      h.push(XS('Passo 3 · Resíduo (polo de ordem 2)','Com \\(P(z)='+PzT+'\\) e \\(P\'(z)='+polyT(0,2*s_,p,'z')+'\\):\\[\\Res(f,'+ai+')=\\lim_{z\\to '+ai+'}\\Big(\\frac{P(z)}{(z+'+ai+')^2}\\Big)\'=\\lim_{z\\to '+ai+'}\\frac{P\'(z)(z+'+ai+')-2P(z)}{(z+'+ai+')^3}\\]'+
+        clean('\\[=\\frac{'+par(cT(dPai))+'\\cdot'+cT(tai)+'-2\\cdot'+par(cT(Pai))+'}{'+parPow(cT(tai))+'^3}=\\frac{'+cT(nm)+'}{'+cT(dn)+'}='+cT(res)+'\\]')));
+      h.push(XS('Passo 4 · O arco desaparece','\\[\\Big|\\int_{C_R}f\\Big|\\le\\pi R\\cdot\\frac{'+polyT(s_,Math.abs(p),q,'R')+'}{(R^2-'+a*a+')^2}\\xrightarrow[R\\to+\\infty]{}0\\]'));
+      h.push(XS('Passo 5 · Resultado','\\[\\int_{-\\infty}^{+\\infty}f(x)\\,dx=2\\pi i\\cdot'+par(cT(res))+'='+piT(Wv)+'\\]',dom==='R'))}
+    else{const a=e.a,a4=Math.pow(a,4),x2=e.P==='x2';PxT=x2?'x^2':'1';PzT=x2?'z^2':'1';QxT='x^4+'+a4;fxr=x=>(x2?x*x:1)/(x*x*x*x+a4);
+      const z1=a===1?'\\frac{\\sqrt2}{2}(1+i)':'\\sqrt2\\,(1+i)',z2=a===1?'\\frac{\\sqrt2}{2}(-1+i)':'\\sqrt2\\,(-1+i)',ae=a===1?'':'2';
+      const D=x2?(a===1?4:8):(a===1?4:32);Wv=null;
+      h.push(XS('Passo 1 · Condições','\\(Q(x)='+QxT+'\\) tem grau \\(4\\ge'+(x2?2:0)+'+2\\) e não tem zeros reais; a função é par. Seja \\(f(z)=\\frac{'+PzT+'}{z^4+'+a4+'}\\).'));
+      h.push(XS('Passo 2 · Singularidades','\\(z^4=-'+a4+'='+(a===1?'':a4)+'e^{i\\pi}\\iff z='+ae+'e^{i(\\frac\\pi4+\\frac{k\\pi}{2})}\\), \\(k=0,1,2,3\\): quatro polos simples. No semiplano superior: \\(z_1='+ae+'e^{i\\pi/4}='+z1+'\\) e \\(z_2='+ae+'e^{i3\\pi/4}='+z2+'\\).'));
+      const rk=x2?'\\frac{z_k^2}{4z_k^3}=\\frac{1}{4z_k}=\\frac{\\overline{z_k}}{4|z_k|^2}=\\frac{\\overline{z_k}}{'+4*a*a+'}':'\\frac{1}{4z_k^3}=\\frac{z_k}{4z_k^4}=-\\frac{z_k}{'+4*a4+'}';
+      h.push(XS('Passo 3 · Resíduos (definição de derivada)','Como \\(z_k^4+'+a4+'=0\\):\\[\\Res(f,z_k)=\\lim_{z\\to z_k}\\frac{(z-z_k)\\,'+(x2?'z^2':'1')+'}{z^4+'+a4+'}='+rk+'\\]'));
+      const sumT=x2?'\\frac{\\overline{z_1}+\\overline{z_2}}{'+4*a*a+'}=\\frac{-'+(a===1?'':'2')+'\\sqrt2\\,i}{'+4*a*a+'}':'-\\frac{z_1+z_2}{'+4*a4+'}=-\\frac{'+(a===1?'':'2')+'\\sqrt2\\,i}{'+4*a4+'}';
+      h.push(XS('Passo 4 · Soma dos resíduos','\\(z_1+z_2='+(a===1?'':'2')+'\\sqrt2\\,i\\), logo\\[\\Res(f,z_1)+\\Res(f,z_2)='+sumT+'=-\\frac{\\sqrt2}{'+D+'}\\,i.\\]E o arco desaparece porque \\(\\deg Q\\ge\\deg P+2\\).'));
+      h.push(XS('Passo 5 · Resultado','\\[\\int_{-\\infty}^{+\\infty}f(x)\\,dx=2\\pi i\\Big(-\\frac{\\sqrt2}{'+D+'}\\,i\\Big)=\\frac{\\pi\\sqrt2}{'+D/2+'}\\]',dom==='R'));
+      e.D=D}
+    // meia reta
+    const exact=e.fam==='C'?Math.PI*Math.SQRT2/(e.D/2):Math.PI*gnum(Wv).re;
+    const lo=dom==='pos'?0:-Math.PI/2+1e-7,hi=dom==='neg'?0:Math.PI/2-1e-7,num=rint(t=>{const x=Math.tan(t),c=Math.cos(t);return fxr(x)/(c*c)},lo,hi,6000);
+    if(dom!=='R'){const half=e.fam==='C'?'\\frac{\\pi\\sqrt2}{'+e.D+'}':piT(gmul(Wv,G(Q(1,2))));
+      h.push(XS('Passo 6 · Meia reta','A função é par, logo\\['+intT+'f(x)\\,dx=\\frac12\\int_{-\\infty}^{+\\infty}f(x)\\,dx='+half+'\\]',true))}
+    const ex=dom==='R'?exact:exact/2;
+    h[h.length-1]=h[h.length-1].replace(/<\/div>$/,'<div class="check">Verificação numérica: ≈ '+fx(num,5)+' · exato ≈ '+fx(ex,5)+'</div></div>');
+    setTeX(en,'<p style="margin-top:0">Calcule</p>\\['+intT+'\\frac{'+PxT+'}{'+QxT+'}\\,dx.\\]');
+    if(e.fam==='A')figure([{z:C(0,e.a),l:txt(G(0,e.a))},{z:C(0,e.b),l:txt(G(0,e.b))}],[{z:C(0,-e.a)},{z:C(0,-e.b)}],e.b*1.35);
+    else if(e.fam==='B')figure([{z:C(0,e.a),l:txt(G(0,e.a))+' (duplo)'}],[{z:C(0,-e.a)}],e.a*1.6);
+    else{const r=e.a/Math.SQRT2;figure([{z:C(r,r),l:'z₁'},{z:C(-r,r),l:'z₂'}],[{z:C(r,-r)},{z:C(-r,-r)}],e.a*1.5)}
+    ctl.set(h.join(''))}
+  $('[data-act=new]',s).addEventListener('click',build);build()}};
+
+/* 23 · integral trigonométrico animado */
+W.trig={init(s){
+  const g=$('svg.tg',s),c=$('svg.tc',s),out=$('[data-out=t]',s);
+  const X=t=>34+306*t/(2*Math.PI),Y=v=>146-120*v,fn=t=>1/(2+Math.cos(t));
+  S('line',{x1:30,y1:Y(0),x2:350,y2:Y(0),class:'ax'},g);S('line',{x1:34,y1:Y(0)+4,x2:34,y2:10,class:'ax'},g);
+  [[0,'0'],[Math.PI,'π'],[2*Math.PI,'2π']].forEach(a=>{S('line',{x1:X(a[0]),y1:Y(0),x2:X(a[0]),y2:Y(0)+5,class:'ax'},g);T(g,X(a[0]),Y(0)+19,a[1],'m',{'text-anchor':'middle'})});
+  [[1,'1'],[1/3,'1/3']].forEach(a=>{S('line',{x1:34,y1:Y(a[0]),x2:350,y2:Y(a[0]),class:'gl'},g);T(g,30,Y(a[0])+4,a[1],'lbl',{'text-anchor':'end'})});
+  const pts=[];for(let j=0;j<=200;j++){const t=2*Math.PI*j/200;pts.push(X(t).toFixed(1)+','+Y(fn(t)).toFixed(1))}
+  const area=S('path',{class:'area'},g);S('polyline',{points:pts.join(' '),class:'cur2'},g);const gp=S('circle',{r:5.5,class:'dot'},g);
+  T(g,340,24,'1/(2+cos t)','lbl',{'text-anchor':'end'});
+  const O=[236,95],U=70;
+  S('line',{x1:0,y1:O[1],x2:360,y2:O[1],class:'ax'},c);S('line',{x1:O[0],y1:185,x2:O[0],y2:5,class:'ax'},c);
+  S('circle',{cx:O[0],cy:O[1],r:U,class:'cur',style:'opacity:.5'},c);
+  const z1=-2+Math.sqrt(3);S('circle',{cx:O[0]+U*z1,cy:O[1],r:6,class:'pole'},c);T(c,O[0]+U*z1-14,O[1]-12,'z₁','m');
+  arrowAt(S('path',{d:AH,class:'ah',style:'fill:var(--muted)'},c),14,O[1],180);T(c,20,O[1]-10,'z₂ ≈ −3,73 (fora)','lbl');
+  const sp=S('line',{x1:O[0],y1:O[1],class:'cur'},c),cp=S('circle',{r:6.5,class:'dot'},c);T(c,O[0]+U+6,O[1]+18,'|z| = 1','lbl');
+  const cum=[0];for(let j=1;j<=400;j++){cum.push(cum[j-1]+rint(fn,2*Math.PI*(j-1)/400,2*Math.PI*j/400,4))}
+  let raf=0,t0=0;
+  function draw(t){let d='M'+X(0)+' '+Y(0);const M=Math.max(2,Math.ceil(t/.03));for(let j=0;j<=M;j++){const tt=t*j/M;d+=' L'+X(tt).toFixed(1)+' '+Y(fn(tt)).toFixed(1)}d+=' L'+X(t).toFixed(1)+' '+Y(0)+'Z';area.setAttribute('d',d);
+    gp.setAttribute('cx',X(t));gp.setAttribute('cy',Y(fn(t)));const x=O[0]+U*Math.cos(t),y=O[1]-U*Math.sin(t);sp.setAttribute('x2',x);sp.setAttribute('y2',y);cp.setAttribute('cx',x);cp.setAttribute('cy',y);
+    out.textContent='t = '+fx(t,2)+'  ·  área acumulada ≈ '+fx(cum[Math.round(400*t/(2*Math.PI))],4)+'  ·  total 2π/√3 ≈ '+fx(2*Math.PI/Math.sqrt(3),4)}
+  const loop=now=>{const t=((now-t0)%7000)/7000*2*Math.PI;draw(t);raf=requestAnimationFrame(loop)};
+  draw(2*Math.PI);
+  this.start=()=>{if(RM){draw(2*Math.PI);return}cancelAnimationFrame(raf);t0=performance.now();raf=requestAnimationFrame(loop)};this.stop=()=>cancelAnimationFrame(raf)},
+  enter(){this.start&&this.start()},leave(){this.stop&&this.stop()}};
+
+/* 24 · exercício aleatório: integral trigonométrico */
+const TRI=[[5,3,4],[5,4,3],[10,6,8],[10,8,6],[13,5,12],[13,12,5],[17,8,15],[17,15,8],[25,7,24],[25,24,7]];
+W.ext={init(s){
+  const en=$('[data-out=enun]',s),fig=$('[data-out=fig]',s),st=$('[data-out=steps]',s);
+  const ctl=stepper(st,$('[data-act=next]',s),$('[data-act=all]',s));
+  const rq=(n,d)=>cT(G(Q(n,d)));
+  function build(){const tr=pick(TRI),A=tr[0],B=tr[1]*(Math.random()<.5?1:-1),sv=tr[2],cs=Math.random()<.55;
+    const trig=cs?'\\cos t':'\\sen t',intg=A+(B<0?'-':'+')+Math.abs(B)+trig;
+    const bz=(B===1?'':B===-1?'-':B)+'z^2';
+    const quad=cs?bz+'+'+2*A+'z'+(B<0?'-':'+')+Math.abs(B):bz+'+'+2*A+'iz'+(B<0?'+':'-')+Math.abs(B);
+    setTeX(en,'<p style="margin-top:0">Calcule</p>\\[\\int_0^{2\\pi}\\frac{dt}{'+intg+'}.\\]');
+    const z1n=Q(sv-A,B),z2n=Q(-A-sv,B),z1T=cs?rq(sv-A,B):cT(G(0,z1n)),z2T=cs?rq(-A-sv,B):cT(G(0,z2n)),dT=cs?rq(2*sv,B):cT(G(0,Q(2*sv,B)));
+    const h=[];
+    h.push(XS('Passo 1 · Substituição','Com \\(z=e^{it}\\), \\(t\\in[0,2\\pi]\\), o caminho é \\(|z|=1\\) (uma volta, sentido positivo), '+(cs?'\\(\\cos t=\\frac{z+z^{-1}}{2}\\)':'\\(\\sen t=\\frac{z-z^{-1}}{2i}\\)')+' e \\(dt=\\frac{dz}{iz}\\).'));
+    h.push(XS('Passo 2 · Função racional','\\[\\int_0^{2\\pi}\\frac{dt}{'+intg+'}=\\int_{|z|=1}\\frac{1}{'+A+(B<0?'-':'+')+Math.abs(B)+(cs?'\\,\\frac{z+z^{-1}}{2}':'\\,\\frac{z-z^{-1}}{2i}')+'}\\cdot\\frac{dz}{iz}=\\int_{|z|=1}'+(cs?'\\frac{2}{i('+quad+')}':'\\frac{2}{'+quad+'}')+'\\,dz\\]'));
+    const disc=cs?'z=\\frac{-'+A+'\\pm\\sqrt{'+A*A+'-'+B*B+'}}{'+B+'}=\\frac{-'+A+'\\pm'+sv+'}{'+B+'}':'z=\\frac{-'+2*A+'i\\pm\\sqrt{-4\\cdot'+A*A+'+4\\cdot'+B*B+'}}{2\\cdot('+B+')}=i\\,\\frac{-'+A+'\\pm'+sv+'}{'+B+'}';
+    h.push(XS('Passo 3 · Polos',clean('\\(\\,'+quad+'=0\\iff '+disc+'\\), isto é, \\(z_1='+z1T+'\\) e \\(z_2='+z2T+'\\). Como \\(|z_1|\\lt1\\lt|z_2|\\), só \\(z_1\\) está dentro de \\(|z|=1\\) (polo simples).')));
+    const resT=cs?'\\Res(g,z_1)=\\lim_{z\\to z_1}(z-z_1)\\frac{2}{i\\cdot('+B+')(z-z_1)(z-z_2)}=\\frac{2}{i\\cdot('+B+')\\cdot(z_1-z_2)}=\\frac{2}{i\\cdot('+B+')\\cdot'+par(dT)+'}=\\frac{1}{'+sv+'i}'
+                 :'\\Res(g,z_1)=\\lim_{z\\to z_1}(z-z_1)\\frac{2}{('+B+')(z-z_1)(z-z_2)}=\\frac{2}{('+B+')\\cdot(z_1-z_2)}=\\frac{2}{('+B+')\\cdot'+par(dT)+'}=\\frac{1}{'+sv+'i}';
+    h.push(XS('Passo 4 · Resíduo','\\(z_1-z_2='+dT+'\\) e\\['+resT.replace(/\(\-?[0-9]+\)/g,m=>m[1]==='-'?m:m.slice(1,-1))+'\\]'));
+    const num=rint(t=>1/(A+B*(cs?Math.cos(t):Math.sin(t))),0,2*Math.PI,4000);
+    h.push(XS('Passo 5 · Resultado','\\[\\int_0^{2\\pi}\\frac{dt}{'+intg+'}=2\\pi i\\cdot\\frac{1}{'+sv+'i}='+piT(G(Q(2,sv)))+'\\]<div class="check">Verificação numérica: ≈ '+fx(num,5)+' · exato ≈ '+fx(2*Math.PI/sv,5)+'</div>',true));
+    fig.innerHTML='';const O=[150,110],U=62;
+    S('line',{x1:0,y1:O[1],x2:300,y2:O[1],class:'ax'},fig);S('line',{x1:O[0],y1:220,x2:O[0],y2:0,class:'ax'},fig);
+    S('circle',{cx:O[0],cy:O[1],r:U,class:'cur'},fig);[0,1,2].forEach(j=>{const th=j*2*Math.PI/3+.4;arrowAt(S('path',{d:AH,class:'ah'},fig),O[0]+U*Math.cos(th),O[1]-U*Math.sin(th),tanDeg(th,1))});
+    const z1=(sv-A)/B,z2=(-A-sv)/B,P1=cs?[O[0]+U*z1,O[1]]:[O[0],O[1]-U*z1];S('circle',{cx:P1[0],cy:P1[1],r:6.5,class:'pole'},fig);T(fig,P1[0]+8,P1[1]-8,'z₁','m');
+    const lim=cs?2.3:1.6,zc=clamp(z2,-lim,lim),P2=cs?[O[0]+U*zc,O[1]]:[O[0],O[1]-U*zc];
+    if(Math.abs(z2)<=lim){S('circle',{cx:P2[0],cy:P2[1],r:5.5,class:'pole out'},fig);T(fig,P2[0]+8,P2[1]-8,'z₂','m')}
+    else{arrowAt(S('path',{d:AH,class:'ah',style:'fill:var(--muted)'},fig),P2[0],P2[1],cs?(z2<0?180:0):(z2>0?-90:90));T(fig,cs?(z2<0?P2[0]+10:P2[0]-120):P2[0]+12,cs?P2[1]-10:P2[1]+(z2>0?14:-4),'z₂ = '+fx(z2,2)+(cs?'':'i')+' (fora)','lbl')}
+    ctl.set(h.join(''))}
+  $('[data-act=new]',s).addEventListener('click',build);build()}};
+
+/* 25 · |cos z| contra |e^{iz}| */
+W.eiz={init(s){
+  const svg=$('svg.ez',s),rng=$('input',s),oy=$('[data-out=y]',s),ot=$('[data-out=txt]',s);
+  const X=x=>34+336*(x+6)/12,Y=v=>196-170*v/11;
+  [0,2,4,6,8,10].forEach(v=>{S('line',{x1:34,y1:Y(v),x2:370,y2:Y(v),class:'gl'},svg);T(svg,28,Y(v)+4,String(v),'lbl',{'text-anchor':'end'})});
+  S('line',{x1:34,y1:Y(0),x2:370,y2:Y(0),class:'ax'},svg);S('line',{x1:X(0),y1:Y(0),x2:X(0),y2:10,class:'ax'},svg);
+  [-6,-3,0,3,6].forEach(x=>T(svg,X(x),Y(0)+16,String(x).replace('-','−'),'lbl',{'text-anchor':'middle'}));
+  const pc=S('polyline',{class:'cur2'},svg),pe=S('polyline',{class:'cur'},svg);
+  T(svg,370,22,'|cos z|','m',{'text-anchor':'end',style:'fill:var(--accent)'});const le=T(svg,370,0,'|e^{iz}|','m',{'text-anchor':'end',style:'fill:var(--teal)'});
+  le.innerHTML='|e<tspan dy="-6" font-size="11">iz</tspan><tspan dy="6">|</tspan>';
+  function draw(){const y=rng.value/100,sh=Math.sinh(y),ey=Math.exp(-y);const a=[],b=[];
+    for(let j=0;j<=240;j++){const x=-6+12*j/240,v=Math.sqrt(Math.cos(x)*Math.cos(x)+sh*sh);a.push(X(x).toFixed(1)+','+Y(Math.min(v,11.5)).toFixed(1));b.push(X(x).toFixed(1)+','+Y(ey).toFixed(1))}
+    pc.setAttribute('points',a.join(' '));pe.setAttribute('points',b.join(' '));le.setAttribute('y',Y(ey)-8);
+    oy.textContent='y = '+fx(y,2);ot.innerHTML='Em <i>y</i> = '+fx(y,2)+': |cos <i>z</i>| varia entre senh <i>y</i> ≈ '+fx(sh,2)+' e cosh <i>y</i> ≈ '+fx(Math.cosh(y),2)+', enquanto |e<sup><i>iz</i></sup>| = e<sup>−<i>y</i></sup> ≈ '+fx(ey,2)+'.'}
+  rng.addEventListener('input',draw);draw()}};
+
+/* 26 · EDO: arrastar λ */
+W.edo={init(s){
+  const lp=$('svg.lp',s),lx=$('svg.lx',s),ol=$('[data-out=lam]',s),oe=$('[data-out=eq]',s);
+  const PX=a=>120+50*a,PY=b=>130-37*b;
+  S('rect',{x:0,y:0,width:120,height:260,class:'areaG'},lp);S('rect',{x:120,y:0,width:120,height:260,class:'areaA'},lp);
+  for(let k=-2;k<=2;k++)S('line',{x1:PX(k),y1:0,x2:PX(k),y2:260,class:'gl'},lp);for(let k=-3;k<=3;k++)S('line',{x1:0,y1:PY(k),x2:240,y2:PY(k),class:'gl'},lp);
+  S('line',{x1:0,y1:PY(0),x2:240,y2:PY(0),class:'ax'},lp);S('line',{x1:PX(0),y1:0,x2:PX(0),y2:260,class:'ax'},lp);
+  T(lp,8,18,'decai','lbl',{style:'fill:var(--green)'});T(lp,232,18,'cresce','lbl',{'text-anchor':'end',style:'fill:var(--accent)'});T(lp,PX(1)-3,PY(0)+15,'1','lbl');T(lp,PX(0)+5,PY(1)+4,'i','lbl');
+  const pl=S('circle',{r:9,class:'pole',style:'cursor:grab'},lp),pc=S('circle',{r:7,class:'pole',style:'opacity:.45'},lp),tl=T(lp,0,0,'λ','m'),tc=T(lp,0,0,'λ̄','m',{style:'opacity:.6'});
+  const TX=t=>30+280*t/10,TY=v=>130-110*v/3;
+  S('defs',{},lx).innerHTML='<clipPath id="clipEdo"><rect x="30" y="8" width="284" height="244"/></clipPath>';
+  [-3,-2,-1,0,1,2,3].forEach(v=>S('line',{x1:30,y1:TY(v),x2:310,y2:TY(v),class:'gl'},lx));
+  S('line',{x1:30,y1:TY(0),x2:312,y2:TY(0),class:'ax'},lx);S('line',{x1:30,y1:252,x2:30,y2:8,class:'ax'},lx);
+  [0,5,10].forEach(t=>T(lx,TX(t),TY(0)+16,String(t),'lbl',{'text-anchor':'middle'}));T(lx,306,TY(0)-6,'t','m',{'text-anchor':'end'});T(lx,36,20,'x(t)','m');
+  const g=S('g',{'clip-path':'url(#clipEdo)'},lx),env1=S('polyline',{class:'curb dash',style:'opacity:.5'},g),env2=S('polyline',{class:'curb dash',style:'opacity:.5'},g),cv=S('polyline',{class:'cur2'},g);
+  let a=-0.3,b=2,raf=0;
+  const sg=(v,first)=>(v<0?(first?'−':' − '):(first?'':' + '))+fx(Math.abs(v),2);
+  function update(){raf=0;pl.setAttribute('cx',PX(a));pl.setAttribute('cy',PY(b));pc.setAttribute('cx',PX(a));pc.setAttribute('cy',PY(-b));pc.style.display=b===0?'none':'';
+    tl.setAttribute('x',PX(a)+11);tl.setAttribute('y',PY(b)-9);tc.setAttribute('x',PX(a)+11);tc.setAttribute('y',PY(-b)+18);tc.style.display=b===0?'none':'';
+    const c=[],e1=[],e2=[];for(let j=0;j<=300;j++){const t=10*j/300,en=Math.exp(a*t),v=en*Math.cos(b*t);c.push(TX(t).toFixed(1)+','+TY(clamp(v,-3.6,3.6)).toFixed(1));e1.push(TX(t).toFixed(1)+','+TY(clamp(en,-3.6,3.6)).toFixed(1));e2.push(TX(t).toFixed(1)+','+TY(clamp(-en,-3.6,3.6)).toFixed(1))}
+    cv.setAttribute('points',c.join(' '));env1.setAttribute('points',e1.join(' '));env2.setAttribute('points',e2.join(' '));
+    const a1=-2*a,a0=a*a+b*b;
+    ol.textContent=b===0?'λ = '+fx(a,2)+' (raiz dupla)':'λ = '+fx(a,2)+' ± '+fx(b,2)+'i';
+    oe.innerHTML='p(λ) = λ²'+(a1?sg(a1)+'λ':'')+(a0?sg(a0):'')+' &nbsp;·&nbsp; '+(b===0?'x(t) = (c₁ + c₂t) e<sup>'+fx(a,2)+'t</sup>':'x(t) = e<sup>'+fx(a,2)+'t</sup>(c₁ cos '+fx(b,2)+'t + c₂ sen '+fx(b,2)+'t)')+'<br><span class="muted">Desenhado: c₁ = 1, c₂ = 0.</span>'}
+  const req=()=>{if(!raf)raf=requestAnimationFrame(update)};let drag=false;
+  function move(e){const m=lp.getScreenCTM();if(!m)return;const p=lp.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform(m.inverse());
+    a=clamp(Math.round((q.x-120)/50*10)/10,-2.2,2.2);b=clamp(Math.abs(Math.round((130-q.y)/37*10)/10),0,3.3);req()}
+  lp.addEventListener('pointerdown',e=>{drag=true;try{lp.setPointerCapture(e.pointerId)}catch(_){}move(e)});lp.addEventListener('pointermove',e=>{if(drag)move(e)});
+  const end=()=>{drag=false};lp.addEventListener('pointerup',end);lp.addEventListener('pointercancel',end);update()}};
+
+/* ---------- arranque ---------- */
+buildIdx();bindSegs();
+slides.forEach(s=>{const k=s.dataset.w;if(k&&W[k]){try{W[k].init(s)}catch(e){console.error('widget '+k,e)}}});
+setStudy(study);
+const i0=idxOf(location.hash.slice(1));go(i0>=0?i0:0,'start');
+setTimeout(()=>{const l=$('#loading');if(l)l.classList.add('off')},9000);
+mjReady().then(()=>fixWide(document));
+let rzT=0;window.addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>fixWide(document),200)});
+})();
+
+</script>
+</body>
+</html>

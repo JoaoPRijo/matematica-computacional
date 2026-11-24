@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Materiais de Matemática Computacional</title>
+<meta name="description" content="Materiais interativos de Matemática Computacional, Licenciatura em MATD, Iscte Sintra.">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --azul:#003e74; --verde:#007660; --laranja:#cc5c00; --cinza:#5a5a5a; --fundo:#f5f7fa; --cartao:#fff; --linha:#dde3ec; --texto:#1b1b1b; --titulo:#003e74; }
+  @media (prefers-color-scheme: dark) {
+    :root { --fundo:#0f1622; --cartao:#172233; --linha:#2a3a52; --texto:#e7edf5; --cinza:#a7b4c6; --titulo:#8db6f2; color-scheme:dark; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:"Source Sans 3", Arial, sans-serif; background:var(--fundo); color:var(--texto); }
+  header { background:var(--azul); color:#fff; padding:28px 16px; }
+  header div, main { max-width:900px; margin:0 auto; }
+  h1 { margin:0; font-size:1.8em; } header p { margin:6px 0 0; opacity:.85; }
+  main { padding:24px 16px 48px; }
+  h2 { color:var(--titulo); font-size:1.2em; margin:28px 0 12px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; }
+  a.card { display:block; background:var(--cartao); border-radius:10px; padding:16px 18px; text-decoration:none; color:inherit;
+           border:1px solid var(--linha); border-left:6px solid var(--azul); transition:transform .15s, box-shadow .15s; }
+  a.card:hover { transform:translateY(-2px); box-shadow:0 4px 14px rgba(0,0,0,.08); }
+  a.card b { display:block; color:var(--titulo); font-size:1.05em; margin-bottom:4px; }
+  a.card span { color:var(--cinza); font-size:.92em; }
+  a.card small { display:block; margin-top:8px; color:var(--cinza); font-size:.82em; }
+  .card.breve { opacity:.55; pointer-events:none; border-left-color:#999; }
+  footer { text-align:center; color:var(--cinza); font-size:.85em; padding:20px 16px; }
+  kbd { font-family:inherit; border:1px solid var(--linha); border-radius:4px; padding:0 5px; background:var(--cartao); }
+</style>
+</head>
+<body>
+<header><div>
+  <h1>Matemática Computacional — materiais interativos</h1>
+  <p>João Rijo · Licenciatura em MATD · Iscte Sintra · 2026/2027</p>
+</div></header>
+<main>
+  <h2>Slides</h2>
+  <div class="grid">
+    <a class="card" href="slides/residuos/">
+      <b>Resíduos e integrais impróprios</b>
+      <span>Revisão de singularidades, séries de Laurent, classificação de singularidades, resíduos e teorema dos resíduos. Aplicação a integrais impróprios, integrais trigonométricos e transformadas de Fourier.</span>
+      <small>Animações e exercícios aleatórios passo a passo</small>
+    </a>
+    <a class="card breve" href="#">
+      <b>Equações diferenciais</b>
+      <span>Em breve.</span>
+    </a>
+  </div>
+</main>
+<footer>Nos slides: <kbd>→</kbd> avançar · <kbd>←</kbd> recuar · <kbd>I</kbd> índice · <kbd>E</kbd> modo estudo · <kbd>F</kbd> ecrã inteiro</footer>
+</body>
+</html>
