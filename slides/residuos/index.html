@@ -60,6 +60,7 @@ button{font:inherit;color:inherit}
   font-size:clamp(15px,min(1.4vw,2.5vh),30px);line-height:1.45;
   visibility:hidden;opacity:0;transform:translateX(22px);transition:opacity .35s ease,transform .35s ease,visibility 0s linear .35s}
 .slide.past{transform:translateX(-22px)}
+.slide:not(.active),.slide:not(.active) *{pointer-events:none!important}
 .slide.active{visibility:visible;opacity:1;transform:none;transition:opacity .35s ease,transform .35s ease,visibility 0s}
 .wrap{max-width:62em;margin:0 auto;min-height:100%;display:flex;flex-direction:column;justify-content:center}
 .slide h1{font-family:Sora,"IBM Plex Sans",system-ui,sans-serif;font-weight:700;font-size:2.55em;line-height:1.06;margin:.15em 0 .35em;text-wrap:balance;letter-spacing:-.015em}
@@ -112,7 +113,7 @@ kbd{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8em;border:1px
 input[type=range]{accent-color:var(--teal);width:min(260px,52vw)}
 .stack{display:grid;grid-template-columns:minmax(0,1fr)}
 .stack>*{min-width:0;grid-area:1/1;visibility:hidden;opacity:0;transition:opacity .3s ease}
-.stack>.on{visibility:visible;opacity:1}
+.stack>.on{visibility:inherit;opacity:1}
 .reg{opacity:0;transition:opacity .4s ease}
 .reg.on{opacity:1}
 
@@ -385,12 +386,11 @@ window.MathJax={
   <div class="cols c46 mid">
     <div class="panel">
       <div class="seg" data-stack="ring" role="group" aria-label="Escolher o anel">
-        <button>\(0\lt|z|\lt1\)</button><button>\(|z|\gt1\)</button><button>\(0\lt|z-1|\lt1\)</button>
+        <button>\(0\lt|z|\lt1\)</button><button>\(0\lt|z-1|\lt1\)</button>
       </div>
       <svg class="fig" viewBox="0 0 360 260" aria-label="Plano complexo com o anel escolhido">
         <g data-stackof="ring">
           <path class="reg area" fill-rule="evenodd" d="M130 30a100 100 0 1 0 0.01 0z"/>
-          <path class="reg area" fill-rule="evenodd" d="M0 0H360V260H0Z M130 30a100 100 0 1 0 0.01 0z"/>
           <path class="reg area" fill-rule="evenodd" d="M230 30a100 100 0 1 0 0.01 0z"/>
         </g>
         <line class="ax" x1="0" y1="130" x2="360" y2="130"/><line class="ax" x1="130" y1="0" x2="130" y2="260"/>
@@ -402,17 +402,12 @@ window.MathJax={
     <div class="stack" data-stackof="ring">
       <div>
         <h3>Em \(0\lt|z|\lt1\)</h3>
-        \[f(z)=-\frac1z\cdot\frac{1}{1-z}=-\frac1z\sum_{n\ge0}z^n=\class{pp}{-\frac1z}-1-z-z^2-\cdots\]
+        \[\begin{aligned}f(z)&=-\frac1z\cdot\frac{1}{1-z}=-\frac1z\sum_{n\ge0}z^n\\&=\class{pp}{-\frac1z}-1-z-z^2-\cdots\end{aligned}\]
         <p>Parte principal: \(-\frac1z\). Logo \(0\) é um <b>polo simples</b> e \(c_{-1}=-1\).</p>
       </div>
       <div>
-        <h3>Em \(|z|\gt1\)</h3>
-        \[f(z)=\frac{1}{z^2}\cdot\frac{1}{1-\frac1z}=\frac{1}{z^2}\sum_{n\ge0}\frac{1}{z^n}=\frac1{z^2}+\frac1{z^3}+\frac1{z^4}+\cdots\]
-        <p>Há infinitas potências negativas, mas isto <b>não</b> classifica a singularidade \(0\): o anel \(|z|\gt1\) não é da forma \(0\lt|z|\lt r\).</p>
-      </div>
-      <div>
         <h3>Em \(0\lt|z-1|\lt1\)</h3>
-        \[f(z)=\frac{1}{z-1}\cdot\frac{1}{1+(z-1)}=\frac{1}{z-1}\sum_{n\ge0}(-1)^n(z-1)^n=\class{pp}{\frac{1}{z-1}}-1+(z-1)-\cdots\]
+        \[\begin{aligned}f(z)&=\frac{1}{z-1}\cdot\frac{1}{1+(z-1)}=\frac{1}{z-1}\sum_{n\ge0}(-1)^n(z-1)^n\\&=\class{pp}{\frac{1}{z-1}}-1+(z-1)-\cdots\end{aligned}\]
         <p>Logo \(1\) é um <b>polo simples</b> e \(c_{-1}=1\).</p>
       </div>
     </div>
@@ -443,36 +438,6 @@ window.MathJax={
       <p>\(c_n\neq0\) para <b>infinitos</b> valores negativos de \(n\).</p>
       \[e^{1/z}=1+\frac1z+\frac{1}{2z^2}+\frac{1}{6z^3}+\cdots\]
       <p class="feel">Nenhuma das anteriores: \(e^{1/x}\to+\infty\) se \(x\to0^+\), mas \(e^{1/x}\to0\) se \(x\to0^-\).</p>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- 7 · CORES -->
-<section class="slide" data-id="cores" data-title="Ver as singularidades" data-sec="Revisão" data-w="dc">
-<div class="wrap">
-  <h2>Ver as singularidades</h2>
-  <div class="cols c46 mid">
-    <div class="nosw">
-      <div class="dcw"><canvas width="420" height="420" aria-label="Coloração do domínio da função escolhida"></canvas></div>
-      <div class="ctrl" style="justify-content:center"><label>zoom <input type="range" min="0" max="1000" value="500" aria-label="Zoom"></label><span class="mono tiny" data-out="win"></span></div>
-    </div>
-    <div>
-      <div class="seg vseg" data-stack="dc" role="group" aria-label="Escolher a função">
-        <button>\(\dfrac{\sen z}{z}\) · removível em \(0\)</button>
-        <button>\(\dfrac{1}{z^2}\) · polo de ordem \(2\)</button>
-        <button>\(\dfrac{\sen z}{z^3}\) · polo de ordem \(2\)</button>
-        <button>\(\dfrac{1}{z(z-1)}\) · dois polos simples</button>
-        <button>\(e^{1/z}\) · essencial em \(0\)</button>
-      </div>
-      <div class="stack small" data-stackof="dc">
-        <p>Nada de especial em \(0\): a função prolonga-se com o valor \(1\). As “rodas” de cores em \(\pm\pi\) são zeros de \(\sen z\).</p>
-        <p>À volta de \(0\) as cores dão <b>duas voltas</b> (no sentido contrário ao de um zero) e os anéis acumulam-se: \(|f|\to+\infty\).</p>
-        <p>O mesmo desenho que \(\frac{1}{z^2}\) perto de \(0\): duas voltas de cores. O \(\sen z\) “come” uma potência de \(z\).</p>
-        <p>Uma volta de cores à volta de cada polo simples, em \(0\) e em \(1\).</p>
-        <p>Perto de \(0\) aparecem <b>todas as cores infinitas vezes</b>: nem limitada, nem \(|f|\to+\infty\). Faça zoom!</p>
-      </div>
-      <p class="tiny muted">Cada ponto \(z\) é pintado com a cor do argumento de \(f(z)\): vermelho para \(\arg f(z)=0\), depois amarelo, verde, azul e magenta. As bandas de brilho marcam \(|f(z)|\) a duplicar.</p>
     </div>
   </div>
 </div>
